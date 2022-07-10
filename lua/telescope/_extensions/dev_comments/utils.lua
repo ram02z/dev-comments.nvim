@@ -9,7 +9,7 @@ local comment_tag_highlight = {
   ["BUG"] = "TSDanger",
 }
 
-dc_utils.get_highlight_by_tag = function (tag)
+dc_utils.get_highlight_by_tag = function(tag)
   local hl_name = comment_tag_highlight[tag]
   if not hl_name then
     hl_name = "TSNote"
@@ -17,7 +17,6 @@ dc_utils.get_highlight_by_tag = function (tag)
 
   return hl_name
 end
-
 
 dc_utils.get_filename_fn = function()
   local bufnr_name_cache = {}
@@ -34,7 +33,6 @@ dc_utils.get_filename_fn = function()
   end
 end
 
-
 dc_utils.get_node_text = function(node, bufnr)
   if not node then
     return ""
@@ -42,7 +40,5 @@ dc_utils.get_node_text = function(node, bufnr)
 
   return vim.treesitter.get_node_text(node, bufnr)
 end
-
-
 
 return dc_utils

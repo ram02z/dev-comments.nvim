@@ -19,7 +19,6 @@ local entry_maker = function(opts)
   })
 
   local make_display = function(entry)
-
     local display_columns = {
       { entry.tag, utils.get_highlight_by_tag(entry.tag), utils.get_highlight_by_tag(entry.tag) },
       { entry.user, "TSConstant" },
