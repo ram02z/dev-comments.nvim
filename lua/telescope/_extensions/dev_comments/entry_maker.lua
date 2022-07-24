@@ -13,11 +13,13 @@ local entry_maker = function(opts)
     { remaining = true },
   }
 
+  -- TODO: don't rely on this method
   local displayer = entry_display.create({
     separator = " ",
     items = display_items,
   })
 
+  -- TODO: add the name of the buffer and line number
   local make_display = function(entry)
     local display_columns = {
       { entry.tag, utils.get_highlight_by_tag(entry.tag), utils.get_highlight_by_tag(entry.tag) },
@@ -32,6 +34,7 @@ local entry_maker = function(opts)
   return function(entry)
     local start_row, start_col, end_row, _ = entry.node:range()
     local node_text = utils.get_node_text(entry.node, bufnr)
+    -- FIXME: truncate multiline comments at first new line
     -- HACK: keeps only the comment text
     node_text = node_text:match("^.*%:(.*)")
     return make_entry.set_default_entry_mt({

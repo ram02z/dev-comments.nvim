@@ -1,0 +1,6 @@
+-- TODO: allow deleting the node?
+-- TODO: change the tag of the node?
+-- TODO: change the assigned user of the node?
+-- TODO: get the link to the issue?
+-- TODO: hide the buffer names?
+-- TODO: toggle preview
