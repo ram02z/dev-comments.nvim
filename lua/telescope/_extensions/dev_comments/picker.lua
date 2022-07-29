@@ -13,13 +13,13 @@ dc_picker.picker = function(opts)
 
   local hl = vim.treesitter.highlighter.active[bufnr]
   if not hl then
-    error("Treesitter not active on bufnr: " .. bufnr)
+    vim.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.WARN)
   end
 
   local results = finder(bufnr)
 
   if vim.tbl_isempty(results) then
-    error("No dev comments on bufnr: " .. bufnr)
+    vim.notify("No dev comments on bufnr: " .. bufnr, vim.log.levels.WARN)
   end
 
   pickers
