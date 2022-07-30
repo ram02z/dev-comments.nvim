@@ -38,15 +38,12 @@ dc_picker.picker = function(opts)
       if not hl then
         vim.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.DEBUG)
       end
-      results = finder(bufnr, results)
+      results = finder(bufnr, results, opts)
     end
   end
 
   if vim.tbl_isempty(results) then
     vim.notify("No dev comments found", vim.log.levels.INFO)
-  else
-    results = utils.filter_by_key(results, opts.tags, "tag")
-    results = utils.filter_by_key(results, opts.users, "user")
   end
 
   pickers

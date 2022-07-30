@@ -4,9 +4,10 @@ local utils = require("telescope._extensions.dev_comments.utils")
 --
 -- @param bufnr: the buffer handle
 -- @param results: table of results (used for recursive calls)
+-- @param opts: table of options from picker
 --
 -- @returns results: table of nodes parsed by "comment" parser
-local finder = function(bufnr, results)
+local finder = function(bufnr, results, opts)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   results = results or {}
   local status, root_lang_tree = pcall(vim.treesitter.get_parser, bufnr)
@@ -30,12 +31,19 @@ local finder = function(bufnr, results)
     local root_node = tree:root()
     local child_node = root_node:named_child()
     if child_node and child_node:type() == "tag" then
-      table.insert(results, {
-        node = root_node,
-        tag = utils.get_node_text(child_node:named_child(0), bufnr),
-        user = utils.get_node_text(child_node:named_child(1), bufnr),
-        bufnr = bufnr,
-      })
+      local tag = utils.get_node_text(child_node:named_child(0), bufnr)
+      local user = utils.get_node_text(child_node:named_child(1), bufnr)
+      if
+        (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
+        and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
+      then
+        table.insert(results, {
+          node = root_node,
+          tag = tag,
+          user = user,
+          bufnr = bufnr,
+        })
+      end
     end
   end)
 
