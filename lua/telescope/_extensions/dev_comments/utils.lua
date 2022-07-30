@@ -48,7 +48,7 @@ dc_utils.load_buffers = function(cwd, hidden, depth)
   hidden = hidden or false
   depth = depth or 3
 
-  local files = S.scan_dir(cwd, { hidden = hidden , depth = depth })
+  local files = S.scan_dir(cwd, { hidden = hidden, depth = depth })
 
   for _, file_path in ipairs(files) do
     local file = P:new(file_path)
@@ -57,7 +57,7 @@ dc_utils.load_buffers = function(cwd, hidden, depth)
       file_name = file:expand()
       bufnr = vim.fn.bufadd(file_name)
       -- NOTE: silent is required to avoid E325
-      vim.cmd("silent! call bufload("..bufnr..")")
+      vim.cmd("silent! call bufload(" .. bufnr .. ")")
       -- vim.fn.bufload(bufnr)
       -- vim.notify("Loaded file: " .. file_name, vim.log.levels.DEBUG)
     end
@@ -92,7 +92,7 @@ dc_utils.filter_buffers = function(buffer_handles, cwd)
 end
 
 dc_utils.split_at_first_occurance = function(s, sep)
-  local t = vim.split(s, sep, {trimempty=true})
+  local t = vim.split(s, sep, { trimempty = true })
   if #t == 0 then
     return s
   end
