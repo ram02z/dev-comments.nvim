@@ -99,4 +99,17 @@ dc_utils.split_at_first_occurance = function(s, sep)
   return table.concat(t, "", 2, #t)
 end
 
+dc_utils.filter_by_key = function(t1, t2, key)
+  if #t2 == 0 then
+    return t1
+  end
+
+  return vim.tbl_filter(function(entry)
+    print(entry[key])
+    if vim.tbl_contains(t2, entry[key]) then
+      return true
+    end
+  end, t1)
+end
+
 return dc_utils

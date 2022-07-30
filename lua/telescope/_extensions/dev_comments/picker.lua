@@ -8,13 +8,13 @@ local finder = require("telescope._extensions.dev_comments.finder")
 local utils = require("telescope._extensions.dev_comments.utils")
 
 dc_picker.picker = function(opts)
-  opts.show_line = vim.F.if_nil(opts.show_line, true)
   -- open, current, all
-  -- TODO: rename this option
-  opts.files = vim.F.if_nil(opts.files, "current")
+  opts.files = vim.F.if_nil(opts.files, "current") -- TODO: rename this option
   opts.cwd = vim.F.if_nil(opts.cwd, nil)
   opts.hidden = vim.F.if_nil(opts.hidden, false)
   opts.depth = vim.F.if_nil(opts.depth, 3)
+  opts.tags = vim.split(opts.tags or "", ",", { trimempty = true })
+  opts.users = vim.split(opts.users or "", ",", { trimempty = true })
 
   local buffer_handles = {}
   if opts.files == "current" then
@@ -44,6 +44,9 @@ dc_picker.picker = function(opts)
 
   if vim.tbl_isempty(results) then
     vim.notify("No dev comments found", vim.log.levels.INFO)
+  else
+    results = utils.filter_by_key(results, opts.tags, "tag")
+    results = utils.filter_by_key(results, opts.users, "user")
   end
 
   pickers
