@@ -5,6 +5,7 @@ local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local entry_maker = require("telescope._extensions.dev_comments.entry_maker")
 local finder = require("telescope._extensions.dev_comments.finder")
+local utils = require("telescope._extensions.dev_comments.utils")
 
 dc_picker.picker = function(opts)
   opts.show_line = vim.F.if_nil(opts.show_line, true)
@@ -16,6 +17,9 @@ dc_picker.picker = function(opts)
   if opts.files == "current" then
     buffer_handles = { vim.api.nvim_get_current_buf() }
   elseif opts.files == "open" then
+    buffer_handles = vim.api.nvim_list_bufs()
+  elseif opts.files == "all" then
+    utils.load_buffers()
     buffer_handles = vim.api.nvim_list_bufs()
   end
 

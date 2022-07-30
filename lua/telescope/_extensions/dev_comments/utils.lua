@@ -41,4 +41,23 @@ dc_utils.get_node_text = function(node, bufnr)
   return vim.treesitter.get_node_text(node, bufnr)
 end
 
+dc_utils.load_buffers = function(cwd)
+  cwd = cwd or vim.loop.cwd()
+
+  local S = require("plenary.scandir")
+  local files = S.scan_dir(cwd, { hidden = true })
+
+  local P = require("plenary.path")
+  for _, file_path in ipairs(files) do
+    local file = P:new(file_path)
+    local bufnr, file_name
+    if file:is_file() then
+      file_name = file:expand()
+      bufnr = vim.fn.bufadd(file_name)
+      vim.fn.bufload(bufnr)
+      vim.notify("Loaded file: " .. file_name, vim.log.levels.DEBUG)
+    end
+  end
+end
+
 return dc_utils
