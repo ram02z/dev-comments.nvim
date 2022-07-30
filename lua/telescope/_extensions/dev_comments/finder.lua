@@ -4,21 +4,14 @@ local utils = require("telescope._extensions.dev_comments.utils")
 --
 -- @param bufnr: the buffer handle
 -- @param results: table of results (used for recursive calls)
--- @param lang_tree: the buffer's language tree
 --
 -- @returns results: table of nodes parsed by "comment" parser
-local finder = function(bufnr, results, lang_tree)
+local finder = function(bufnr, results)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   results = results or {}
-  local status, result = pcall(vim.treesitter.get_parser, bufnr)
+  local status, root_lang_tree = pcall(vim.treesitter.get_parser, bufnr)
   if not status then
-    vim.notify(result, vim.log.levels.WARN)
-    return results
-  end
-
-  local root_lang_tree = result or lang_tree
-  if not root_lang_tree then
-    vim.notify("LanguageTree is nil for bufnr: " .. bufnr, vim.log.levels.WARN)
+    vim.notify(root_lang_tree, vim.log.levels.WARN)
     return results
   end
 
