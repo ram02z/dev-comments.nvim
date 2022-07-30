@@ -1,3 +1,5 @@
+local P = require("plenary.path")
+local S = require("plenary.scandir")
 local dc_utils = {}
 
 local comment_tag_highlight = {
@@ -41,23 +43,60 @@ dc_utils.get_node_text = function(node, bufnr)
   return vim.treesitter.get_node_text(node, bufnr)
 end
 
-dc_utils.load_buffers = function(cwd)
+dc_utils.load_buffers = function(cwd, hidden, depth)
   cwd = cwd or vim.loop.cwd()
+  hidden = hidden or false
+  depth = depth or 3
 
-  local S = require("plenary.scandir")
-  local files = S.scan_dir(cwd, { hidden = true })
+  local files = S.scan_dir(cwd, { hidden = hidden , depth = depth })
 
-  local P = require("plenary.path")
   for _, file_path in ipairs(files) do
     local file = P:new(file_path)
     local bufnr, file_name
     if file:is_file() then
       file_name = file:expand()
       bufnr = vim.fn.bufadd(file_name)
-      vim.fn.bufload(bufnr)
-      vim.notify("Loaded file: " .. file_name, vim.log.levels.DEBUG)
+      -- NOTE: silent is required to avoid E325
+      vim.cmd("silent! call bufload("..bufnr..")")
+      -- vim.fn.bufload(bufnr)
+      -- vim.notify("Loaded file: " .. file_name, vim.log.levels.DEBUG)
     end
   end
+end
+
+-- FIXME: if cwd ends in `/` it won't work
+dc_utils.filter_buffers = function(buffer_handles, cwd)
+  cwd = cwd or vim.loop.cwd()
+  local status, dir = pcall(P.new, cwd)
+  if not status then
+    vim.notify("cwd is invalid")
+    return buffer_handles
+  end
+
+  -- TODO: should this be an error?
+  if not dir:is_dir() then
+    vim.notify("cwd needs to be a valid directory", vim.log.levels.WARN)
+    return buffer_handles
+  end
+
+  local dir_path = dir:expand()
+  local get_filename_fn = dc_utils.get_filename_fn()
+  return vim.tbl_filter(function(bufnr)
+    local file_name = get_filename_fn(bufnr)
+    local file = P:new(file_name)
+    if file:is_file() then
+      local parents = file:parents()
+      return vim.tbl_contains(parents, dir_path)
+    end
+  end, buffer_handles)
+end
+
+dc_utils.split_at_first_occurance = function(s, sep)
+  local t = vim.split(s, sep, {trimempty=true})
+  if #t == 0 then
+    return s
+  end
+  return table.concat(t, "", 2, #t)
 end
 
 return dc_utils

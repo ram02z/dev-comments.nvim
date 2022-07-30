@@ -41,7 +41,7 @@ local entry_maker = function(opts)
     local node_text = utils.get_node_text(entry.node, entry.bufnr)
     -- FIXME: truncate multiline comments at first new line
     -- HACK: keeps only the comment text
-    node_text = node_text:match("^.*%:(.*)")
+    node_text = utils.split_at_first_occurance(node_text, ":")
     return make_entry.set_default_entry_mt({
       bufnr = entry.bufnr,
       value = entry.node,

@@ -12,6 +12,9 @@ dc_picker.picker = function(opts)
   -- open, current, all
   -- TODO: rename this option
   opts.files = vim.F.if_nil(opts.files, "current")
+  opts.cwd = vim.F.if_nil(opts.cwd, nil)
+  opts.hidden = vim.F.if_nil(opts.hidden, false)
+  opts.depth = vim.F.if_nil(opts.depth, 3)
 
   local buffer_handles = {}
   if opts.files == "current" then
@@ -19,8 +22,13 @@ dc_picker.picker = function(opts)
   elseif opts.files == "open" then
     buffer_handles = vim.api.nvim_list_bufs()
   elseif opts.files == "all" then
-    utils.load_buffers()
+    utils.load_buffers(opts.cwd, opts.hidden, opts.depth)
     buffer_handles = vim.api.nvim_list_bufs()
+  end
+
+  -- Only filter buffers if user specifies cwd
+  if opts.cwd then
+    buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd)
   end
 
   local results = {}
@@ -28,7 +36,7 @@ dc_picker.picker = function(opts)
     if vim.api.nvim_buf_is_loaded(bufnr) then
       local hl = vim.treesitter.highlighter.active[bufnr]
       if not hl then
-        vim.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.WARN)
+        vim.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.DEBUG)
       end
       results = finder(bufnr, results)
     end
