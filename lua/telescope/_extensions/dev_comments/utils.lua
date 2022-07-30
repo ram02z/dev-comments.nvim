@@ -64,7 +64,6 @@ dc_utils.load_buffers = function(cwd, hidden, depth)
   end
 end
 
--- FIXME: if cwd ends in `/` it won't work
 dc_utils.filter_buffers = function(buffer_handles, cwd)
   cwd = cwd or vim.loop.cwd()
   local status, dir = pcall(P.new, cwd)
@@ -85,8 +84,8 @@ dc_utils.filter_buffers = function(buffer_handles, cwd)
     local file_name = get_filename_fn(bufnr)
     local file = P:new(file_name)
     if file:is_file() then
-      local parents = file:parents()
-      return vim.tbl_contains(parents, dir_path)
+      -- if file is not relative to the directory, it is not contained in it
+      return file:make_relative(dir_path) ~= file_name
     end
   end, buffer_handles)
 end
