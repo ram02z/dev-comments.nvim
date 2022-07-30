@@ -5,15 +5,15 @@ local utils = require("telescope._extensions.dev_comments.utils")
 local entry_maker = function(opts)
   opts = opts or {}
 
-  local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
-
   local display_items = {
     { width = 8 },
+    { width = 6 },
     { width = 8 },
+    -- { width = 10 },
     { remaining = true },
   }
 
-  -- TODO: don't rely on this method
+  -- TODO: don't rely on this method, since it uses fixed width columns
   local displayer = entry_display.create({
     separator = " ",
     items = display_items,
@@ -24,6 +24,8 @@ local entry_maker = function(opts)
     local display_columns = {
       { entry.tag, utils.get_highlight_by_tag(entry.tag), utils.get_highlight_by_tag(entry.tag) },
       { entry.user, "TSConstant" },
+      { entry.lnum .. ":" .. entry.col, "TSConstant" },
+      -- { entry.filename, "TSConstant" },
       entry.text,
     }
 
@@ -32,12 +34,16 @@ local entry_maker = function(opts)
 
   local get_filename = utils.get_filename_fn()
   return function(entry)
+    if not vim.api.nvim_buf_is_loaded(entry.bufnr) then
+      return
+    end
     local start_row, start_col, end_row, _ = entry.node:range()
-    local node_text = utils.get_node_text(entry.node, bufnr)
+    local node_text = utils.get_node_text(entry.node, entry.bufnr)
     -- FIXME: truncate multiline comments at first new line
     -- HACK: keeps only the comment text
     node_text = node_text:match("^.*%:(.*)")
     return make_entry.set_default_entry_mt({
+      bufnr = entry.bufnr,
       value = entry.node,
       tag = entry.tag,
       user = entry.user,
@@ -46,7 +52,7 @@ local entry_maker = function(opts)
 
       node_text = node_text,
 
-      filename = get_filename(bufnr),
+      filename = get_filename(entry.bufnr),
       -- need to add one since the previewer subtracts one
       lnum = start_row + 1,
       col = start_col,

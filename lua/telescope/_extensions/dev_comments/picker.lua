@@ -8,18 +8,30 @@ local finder = require("telescope._extensions.dev_comments.finder")
 
 dc_picker.picker = function(opts)
   opts.show_line = vim.F.if_nil(opts.show_line, true)
+  -- open, current, all
+  -- TODO: rename this option
+  opts.files = vim.F.if_nil(opts.files, "current")
 
-  local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
-
-  local hl = vim.treesitter.highlighter.active[bufnr]
-  if not hl then
-    vim.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.WARN)
+  local buffer_handles = {}
+  if opts.files == "current" then
+    buffer_handles = { vim.api.nvim_get_current_buf() }
+  elseif opts.files == "open" then
+    buffer_handles = vim.api.nvim_list_bufs()
   end
 
-  local results = finder(bufnr)
+  local results = {}
+  for _, bufnr in ipairs(buffer_handles) do
+    if vim.api.nvim_buf_is_loaded(bufnr) then
+      local hl = vim.treesitter.highlighter.active[bufnr]
+      if not hl then
+        vim.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.WARN)
+      end
+      results = finder(bufnr, results)
+    end
+  end
 
   if vim.tbl_isempty(results) then
-    vim.notify("No dev comments on bufnr: " .. bufnr, vim.log.levels.WARN)
+    vim.notify("No dev comments found", vim.log.levels.INFO)
   end
 
   pickers
