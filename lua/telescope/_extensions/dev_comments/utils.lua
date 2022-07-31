@@ -1,5 +1,3 @@
-local P = require("plenary.path")
-local S = require("plenary.scandir")
 local dc_utils = {}
 
 local comment_tag_highlight = {
@@ -48,8 +46,10 @@ dc_utils.load_buffers = function(cwd, hidden, depth)
   hidden = hidden or false
   depth = depth or 3
 
+  local S = require("plenary.scandir")
   local files = S.scan_dir(cwd, { hidden = hidden, depth = depth })
 
+  local P = require("plenary.path")
   for _, file_path in ipairs(files) do
     local file = P:new(file_path)
     local bufnr, file_name
@@ -66,6 +66,8 @@ end
 
 dc_utils.filter_buffers = function(buffer_handles, cwd)
   cwd = cwd or vim.loop.cwd()
+
+  local P = require("plenary.path")
   local status, dir = pcall(P.new, cwd)
   if not status then
     vim.notify("cwd is invalid")

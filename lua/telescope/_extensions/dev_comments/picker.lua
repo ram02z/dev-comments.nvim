@@ -1,13 +1,15 @@
 local dc_picker = {}
 
-local conf = require("telescope.config").values
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
 local entry_maker = require("telescope._extensions.dev_comments.entry_maker")
 local finder = require("telescope._extensions.dev_comments.finder")
 local utils = require("telescope._extensions.dev_comments.utils")
 
 dc_picker.picker = function(opts)
+  local has_comments_parser = vim.treesitter.require_language("comment", nil, true)
+  if not has_comments_parser then
+    error("This plugin requires 'comment' parser to be installed. Try running 'TSInstall comment'")
+  end
+
   -- open, current, all
   opts.files = vim.F.if_nil(opts.files, "current") -- TODO: rename this option
   opts.cwd = vim.F.if_nil(opts.cwd, nil)
@@ -46,6 +48,9 @@ dc_picker.picker = function(opts)
     vim.notify("No dev comments found", vim.log.levels.INFO)
   end
 
+  local conf = require("telescope.config").values
+  local finders = require("telescope.finders")
+  local pickers = require("telescope.pickers")
   pickers
     .new(opts, {
       prompt_title = "Dev Comments",

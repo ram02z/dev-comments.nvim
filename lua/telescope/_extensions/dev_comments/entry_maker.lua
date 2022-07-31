@@ -1,5 +1,3 @@
-local make_entry = require("telescope.make_entry")
-local entry_display = require("telescope.pickers.entry_display")
 local utils = require("telescope._extensions.dev_comments.utils")
 
 local entry_maker = function(opts)
@@ -14,6 +12,7 @@ local entry_maker = function(opts)
   }
 
   -- TODO: don't rely on this method, since it uses fixed width columns
+  local entry_display = require("telescope.pickers.entry_display")
   local displayer = entry_display.create({
     separator = " ",
     items = display_items,
@@ -37,10 +36,11 @@ local entry_maker = function(opts)
     if not vim.api.nvim_buf_is_loaded(entry.bufnr) then
       return
     end
+    local make_entry = require("telescope.make_entry")
     local start_row, start_col, end_row, _ = entry.node:range()
     local node_text = utils.get_node_text(entry.node, entry.bufnr)
     -- HACK: keeps only the comment text
-    node_text = utils.split_at_first_occurance(node_text, ":")
+    node_text = utils.split_at_first_occurance(node_text, ": ")
     return make_entry.set_default_entry_mt({
       bufnr = entry.bufnr,
       value = entry.node,
