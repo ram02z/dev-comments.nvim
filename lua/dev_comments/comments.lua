@@ -32,20 +32,22 @@ local finder = function(bufnr, results, opts)
 
   comment_lang_tree:for_each_tree(function(tree)
     local root_node = tree:root()
-    local child_node = root_node:named_child()
-    if child_node and child_node:type() == "tag" then
-      local tag = utils.get_node_text(child_node:named_child(0), bufnr)
-      local user = utils.get_node_text(child_node:named_child(1), bufnr)
-      if
-        (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
-        and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
-      then
-        table.insert(results, {
-          node = root_node,
-          tag = tag,
-          user = user,
-          bufnr = bufnr,
-        })
+    for child_node in root_node:iter_children() do
+      if child_node:named() and child_node:type() == "tag" then
+        local tag = utils.get_node_text(child_node:named_child(0), bufnr)
+        local user = utils.get_node_text(child_node:named_child(1), bufnr)
+        if
+          (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
+          and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
+        then
+          -- FIXME: if a comment node contains two tag nodes, we will get the text of the first node
+          table.insert(results, {
+            node = root_node,
+            tag = tag,
+            user = user,
+            bufnr = bufnr,
+          })
+        end
       end
     end
   end)

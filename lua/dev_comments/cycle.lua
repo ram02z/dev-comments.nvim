@@ -9,13 +9,13 @@ local function next_dev_comment(wrap, opts, forward)
 
   wrap = vim.F.if_nil(wrap, false)
 
-  -- assumes results are already ordered by row
+  -- assumes results are in ascending line order
   local results = comments.generate(opts)
   if #results == 0 then
     return
   end
 
-  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
 
   local start_i, end_i, inc_i
   if forward then
@@ -33,14 +33,10 @@ local function next_dev_comment(wrap, opts, forward)
     local entry = results[i]
     node_row, node_col = entry.node:range()
     node_row = node_row + 1
-    if forward and row <= node_row then
-      if row ~= node_row or col > node_col then
-        return { node_row, node_col }
-      end
-    elseif not forward and row >= node_row then
-      if row ~= node_row or col < node_col then
-        return { node_row, node_col }
-      end
+    if forward and row < node_row then
+      return { node_row, node_col }
+    elseif not forward and row > node_row then
+      return { node_row, node_col }
     end
   end
 
