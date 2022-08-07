@@ -1,4 +1,4 @@
-local utils = require("telescope._extensions.dev_comments.utils")
+local utils = require("dev_comments.utils")
 
 local entry_maker = function(opts)
   opts = opts or {}

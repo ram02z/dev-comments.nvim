@@ -1,4 +1,4 @@
-local dc_utils = {}
+local U = {}
 
 local comment_tag_highlight = {
   ["TODO"] = "TSWarning",
@@ -9,7 +9,7 @@ local comment_tag_highlight = {
   ["BUG"] = "TSDanger",
 }
 
-dc_utils.get_highlight_by_tag = function(tag)
+U.get_highlight_by_tag = function(tag)
   local hl_name = comment_tag_highlight[tag]
   if not hl_name then
     hl_name = "TSNote"
@@ -18,7 +18,7 @@ dc_utils.get_highlight_by_tag = function(tag)
   return hl_name
 end
 
-dc_utils.get_filename_fn = function()
+U.get_filename_fn = function()
   local bufnr_name_cache = {}
   return function(bufnr)
     bufnr = vim.F.if_nil(bufnr, 0)
@@ -33,7 +33,7 @@ dc_utils.get_filename_fn = function()
   end
 end
 
-dc_utils.get_node_text = function(node, bufnr)
+U.get_node_text = function(node, bufnr)
   if not node then
     return ""
   end
@@ -41,7 +41,7 @@ dc_utils.get_node_text = function(node, bufnr)
   return vim.treesitter.get_node_text(node, bufnr)
 end
 
-dc_utils.load_buffers = function(cwd, hidden, depth)
+U.load_buffers = function(cwd, hidden, depth)
   cwd = cwd or vim.loop.cwd()
   hidden = hidden or false
   depth = depth or 3
@@ -64,7 +64,7 @@ dc_utils.load_buffers = function(cwd, hidden, depth)
   end
 end
 
-dc_utils.filter_buffers = function(buffer_handles, cwd)
+U.filter_buffers = function(buffer_handles, cwd)
   cwd = cwd or vim.loop.cwd()
 
   local P = require("plenary.path")
@@ -81,7 +81,7 @@ dc_utils.filter_buffers = function(buffer_handles, cwd)
   end
 
   local dir_path = dir:expand()
-  local get_filename_fn = dc_utils.get_filename_fn()
+  local get_filename_fn = U.get_filename_fn()
   return vim.tbl_filter(function(bufnr)
     local file_name = get_filename_fn(bufnr)
     local file = P:new(file_name)
@@ -92,7 +92,7 @@ dc_utils.filter_buffers = function(buffer_handles, cwd)
   end, buffer_handles)
 end
 
-dc_utils.split_at_first_occurance = function(s, sep)
+U.split_at_first_occurance = function(s, sep)
   local t = vim.split(s, sep, { trimempty = true })
   if #t == 0 then
     return s
@@ -102,4 +102,4 @@ dc_utils.split_at_first_occurance = function(s, sep)
   return vim.split(s, "\n")[1]
 end
 
-return dc_utils
+return U
