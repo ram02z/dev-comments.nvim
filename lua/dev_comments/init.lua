@@ -1,24 +1,26 @@
 local dev_comments = {}
 
+local Files = require("dev_comments.constants").Files
+
 dev_comments.config = {
   debug = false,
   default_mappings = true,
   cache = true,
   telescope = {
     load = true,
-    current = {
+    [Files.CURRENT] = {
       hidden = false,
       depth = 3,
       tags = "",
       users = "",
     },
-    open = {
+    [Files.OPEN] = {
       hidden = false,
       depth = 3,
       tags = "",
       users = "",
     },
-    all = {
+    [Files.ALL] = {
       hidden = false,
       depth = 3,
       tags = "",

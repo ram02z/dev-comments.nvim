@@ -2,8 +2,10 @@
 
 C = {}
 
+local Files = require("dev_comments.constants").Files
+
 local registered = false
-local cache = { ["all"] = {}, ["current"] = {}, ["open"] = {} }
+local cache = { [Files.ALL] = {}, [Files.CURRENT] = {}, [Files.OPEN] = {} }
 
 local hash_func = function(opts)
   local cwd = opts.cwd
@@ -50,9 +52,9 @@ C.register = function()
   local id = vim.api.nvim_create_augroup("DevComments", { clear = true })
   vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter" }, {
     callback = function()
-      C.reset("current")
-      C.reset("open")
-      C.reset("all")
+      C.reset(Files.CURRENT)
+      C.reset(Files.OPEN)
+      C.reset(Files.ALL)
     end,
     group = id,
   })

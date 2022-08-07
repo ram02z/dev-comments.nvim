@@ -1,5 +1,6 @@
 local C = {}
 
+local Files = require("dev_comments.constants").Files
 local cache = require("dev_comments.cache")
 local utils = require("dev_comments.utils")
 
@@ -89,11 +90,11 @@ C.generate = function(files, opts)
   end
 
   local buffer_handles = {}
-  if opts.files == "current" then
+  if opts.files == Files.CURRENT then
     buffer_handles = { vim.api.nvim_get_current_buf() }
-  elseif opts.files == "open" then
+  elseif opts.files == Files.OPEN then
     buffer_handles = vim.api.nvim_list_bufs()
-  elseif opts.files == "all" then
+  elseif opts.files == Files.ALL then
     utils.load_buffers(opts.cwd, opts.hidden, opts.depth)
     buffer_handles = vim.api.nvim_list_bufs()
   end

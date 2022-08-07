@@ -1,5 +1,6 @@
 local dc_picker = {}
 
+local Files = require("dev_comments.constants").Files
 local entry_maker = require("telescope._extensions.dev_comments.entry_maker")
 local comments = require("dev_comments.comments")
 local utils = require("dev_comments.utils")
@@ -34,15 +35,15 @@ local picker = function(files, opts)
 end
 
 dc_picker.current = function(opts)
-  picker("current", opts)
+  picker(Files.CURRENT, opts)
 end
 
 dc_picker.open = function(opts)
-  picker("open", opts)
+  picker(Files.OPEN, opts)
 end
 
 dc_picker.all = function(opts)
-  picker("all", opts)
+  picker(Files.ALL, opts)
 end
 
 return dc_picker
