@@ -9,14 +9,10 @@ dev_comments.config = {
   telescope = {
     load = true,
     [Files.CURRENT] = {
-      hidden = false,
-      depth = 3,
       tags = "",
       users = "",
     },
     [Files.OPEN] = {
-      hidden = false,
-      depth = 3,
       tags = "",
       users = "",
     },
