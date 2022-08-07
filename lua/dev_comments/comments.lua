@@ -15,7 +15,7 @@ local finder = function(bufnr, results, opts)
   results = results or {}
   local status, root_lang_tree = pcall(vim.treesitter.get_parser, bufnr)
   if not status then
-    vim.notify(root_lang_tree, vim.log.levels.WARN)
+    utils.notify(root_lang_tree, vim.log.levels.WARN)
     return results
   end
 
@@ -34,13 +34,22 @@ local finder = function(bufnr, results, opts)
     local root_node = tree:root()
     for child_node in root_node:iter_children() do
       if child_node:named() and child_node:type() == "tag" then
-        local tag = utils.get_node_text(child_node:named_child(0), bufnr)
-        local user = utils.get_node_text(child_node:named_child(1), bufnr)
+        local tag = ""
+        local user = ""
+        for tag_child_node in child_node:iter_children() do
+          if tag_child_node:named() then
+            if tag_child_node:type() == "name" then
+              tag = utils.get_node_text(tag_child_node, bufnr)
+            elseif tag_child_node:type() == "user" then
+              user = utils.get_node_text(tag_child_node, bufnr)
+            end
+          end
+        end
         if
           (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
           and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
         then
-          -- FIXME: if a comment node contains two tag nodes, we will get the text of the first node
+          -- FIXME: if a comment node contains two tag nodes, it will get the text of the comment node
           table.insert(results, {
             node = root_node,
             tag = tag,
@@ -55,26 +64,27 @@ local finder = function(bufnr, results, opts)
   return results
 end
 
-C.generate = function(opts)
+local set_opts = function(files, opts)
+  local config = require("dev_comments").config
+  opts.hidden = vim.F.if_nil(opts.hidden, config.telescope[files].hidden)
+  opts.depth = vim.F.if_nil(opts.depth, config.telescope[files].depth)
+  opts.tags = vim.split(opts.tags or config.telescope[files].tags, ",", { trimempty = true })
+  opts.users = vim.split(opts.users or config.telescope[files].users, ",", { trimempty = true })
+end
+
+C.generate = function(files, opts)
   local has_comments_parser = vim.treesitter.require_language("comment", nil, true)
   if not has_comments_parser then
     error("This plugin requires 'comment' parser to be installed. Try running 'TSInstall comment'")
   end
 
-  cache.register()
-
   opts = opts or {}
-  -- open, current, all
-  opts.files = vim.F.if_nil(opts.files, "current") -- TODO: rename this option
-  opts.cwd = vim.F.if_nil(opts.cwd, vim.loop.cwd())
-  opts.hidden = vim.F.if_nil(opts.hidden, false)
-  opts.depth = vim.F.if_nil(opts.depth, 3)
-  opts.tags = vim.split(opts.tags or "", ",", { trimempty = true })
-  opts.users = vim.split(opts.users or "", ",", { trimempty = true })
+  opts.files = files
+  set_opts(files, opts)
 
   local results = cache.get(opts)
   if results then
-    vim.notify("cache hit", vim.log.levels.DEBUG)
+    utils.notify("cache hit", vim.log.levels.DEBUG)
     return results
   end
 
@@ -98,14 +108,14 @@ C.generate = function(opts)
     if vim.api.nvim_buf_is_loaded(bufnr) then
       local hl = vim.treesitter.highlighter.active[bufnr]
       if not hl then
-        vim.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.DEBUG)
+        utils.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.DEBUG)
       end
       results = finder(bufnr, results, opts)
     end
   end
 
   if not cache.add(results, opts) then
-    vim.notify("couldn't add to cache. Cache is either not registered or files is invalid.")
+    utils.notify("couldn't add to cache. Cache is either not registered or files is invalid.")
   end
 
   return results

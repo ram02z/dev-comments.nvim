@@ -9,6 +9,13 @@ local comment_tag_highlight = {
   ["BUG"] = "TSDanger",
 }
 
+U.notify = function(msg, level, opts)
+  local config = require("dev_comments").config
+  if config.debug then
+    vim.notify(msg, level, opts)
+  end
+end
+
 U.get_highlight_by_tag = function(tag)
   local hl_name = comment_tag_highlight[tag]
   if not hl_name then
@@ -70,13 +77,13 @@ U.filter_buffers = function(buffer_handles, cwd)
   local P = require("plenary.path")
   local status, dir = pcall(P.new, cwd)
   if not status then
-    vim.notify("cwd is invalid")
+    U.notify("cwd is invalid", vim.log.levels.WARN)
     return buffer_handles
   end
 
   -- TODO: should this be an error?
   if not dir:is_dir() then
-    vim.notify("cwd needs to be a valid directory", vim.log.levels.WARN)
+    U.notify("cwd needs to be a valid directory", vim.log.levels.WARN)
     return buffer_handles
   end
 

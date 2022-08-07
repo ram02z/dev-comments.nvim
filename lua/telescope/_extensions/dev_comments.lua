@@ -6,5 +6,9 @@ if not has_telescope then
 end
 
 return telescope.register_extension({
-  exports = { dev_comments = picker },
+  exports = {
+    current = picker.current,
+    open = picker.open,
+    all = picker.all,
+  },
 })

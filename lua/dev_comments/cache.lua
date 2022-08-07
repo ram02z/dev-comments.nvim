@@ -48,7 +48,7 @@ C.register = function()
     return
   end
   local id = vim.api.nvim_create_augroup("DevComments", { clear = true })
-  vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+  vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter" }, {
     callback = function()
       C.reset("current")
       C.reset("open")

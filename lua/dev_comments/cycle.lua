@@ -1,16 +1,14 @@
 local C = {}
 
 local comments = require("dev_comments.comments")
+local utils = require("dev_comments.utils")
 
 local function next_dev_comment(wrap, opts, forward)
-  if opts and opts.files ~= "current" then
-    error("opt.files must be set to current")
-  end
-
-  wrap = vim.F.if_nil(wrap, false)
+  local config = require("dev_comments").config
+  wrap = vim.F.if_nil(wrap, config.cycle.wrap)
 
   -- assumes results are in ascending line order
-  local results = comments.generate(opts)
+  local results = comments.generate("current", opts)
   if #results == 0 then
     return
   end
@@ -41,6 +39,7 @@ local function next_dev_comment(wrap, opts, forward)
   end
 
   if wrap then
+    utils.notify("Reached the last node. Wrapping around.", vim.log.levels.INFO)
     if forward then
       node_row, node_col = results[1].node:range()
     else
@@ -56,7 +55,7 @@ local function moveto_pos(pos)
   local win_id = vim.api.nvim_get_current_win()
 
   if not pos then
-    vim.notify("No dev comment found", vim.log.levels.WARN)
+    utils.notify("No dev comments to move to", vim.log.levels.WARN)
     return
   end
 
