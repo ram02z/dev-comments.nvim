@@ -4,6 +4,19 @@ local Files = require("dev_comments.constants").Files
 local cache = require("dev_comments.cache")
 local utils = require("dev_comments.utils")
 
+local get_named_child_node_text = function(node, name, bufnr)
+  bufnr = bufnr or 0
+  local node_text = ""
+  for child_node in node:iter_children() do
+    if child_node:named() and child_node:type() == name then
+      node_text = utils.get_node_text(child_node, bufnr)
+      break
+    end
+  end
+
+  return node_text
+end
+
 -- Returns table of nodes parsed by "comment" parser
 --
 -- @param bufnr: the buffer handle
@@ -35,17 +48,8 @@ local finder = function(bufnr, results, opts)
     local root_node = tree:root()
     for child_node in root_node:iter_children() do
       if child_node:named() and child_node:type() == "tag" then
-        local tag = ""
-        local user = ""
-        for tag_child_node in child_node:iter_children() do
-          if tag_child_node:named() then
-            if tag_child_node:type() == "name" then
-              tag = utils.get_node_text(tag_child_node, bufnr)
-            elseif tag_child_node:type() == "user" then
-              user = utils.get_node_text(tag_child_node, bufnr)
-            end
-          end
-        end
+        local tag = get_named_child_node_text(child_node, "name", bufnr)
+        local user = get_named_child_node_text(child_node, "user", bufnr)
         if
           (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
           and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
