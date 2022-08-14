@@ -47,7 +47,7 @@ end
 
 C.register = function()
   if registered then
-    return
+    return false
   end
   local id = vim.api.nvim_create_augroup("DevComments", { clear = true })
   vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter" }, {
@@ -59,14 +59,16 @@ C.register = function()
     group = id,
   })
   registered = true
+  return true
 end
 
 C.unregister = function()
   if not registered then
-    return
+    return false
   end
   vim.api.nvim_del_augroup_by_name("DevComments")
   registered = false
+  return true
 end
 
 return C
