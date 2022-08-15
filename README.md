@@ -1,2 +1,2 @@
-# telescope-dev-comments.nvim
-Telescope picker using tree-sitter-comment parser
+# dev-comments.nvim
+List and search for dev comments using tree-sitter-comment parser
