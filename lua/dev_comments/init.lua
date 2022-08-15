@@ -2,6 +2,7 @@
 local dev_comments = {}
 
 local Files = require("dev_comments.constants").Files
+local FilterCommand = require("dev_comments.constants").FilterCommand
 
 dev_comments.config = {
   debug = false,
@@ -27,6 +28,10 @@ dev_comments.config = {
   },
   cycle = {
     wrap = true,
+  },
+  pre_filter = {
+    command = FilterCommand.RIPGREP,
+    fallback_to_plenary = true,
   },
 }
 

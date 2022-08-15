@@ -48,10 +48,10 @@ U.get_node_text = function(node, bufnr)
   return vim.treesitter.get_node_text(node, bufnr)
 end
 
-U.load_buffers = function(cwd, hidden, depth)
+U.load_buffers_by_cwd = function(cwd, hidden, depth)
   cwd = cwd or vim.loop.cwd()
-  hidden = hidden or false
-  depth = depth or 3
+  hidden = vim.F.if_nil(hidden, false)
+  depth = vim.F.if_nil(depth, 3)
 
   local S = require("plenary.scandir")
   local files = S.scan_dir(cwd, { hidden = hidden, depth = depth })
@@ -59,16 +59,34 @@ U.load_buffers = function(cwd, hidden, depth)
   local P = require("plenary.path")
   for _, file_path in ipairs(files) do
     local file = P:new(file_path)
-    local bufnr, file_name
+    local bufnr
     if file:is_file() then
-      file_name = file:expand()
-      bufnr = vim.fn.bufadd(file_name)
+      bufnr = vim.fn.bufadd(file:expand())
       -- NOTE: silent is required to avoid E325
       vim.cmd("silent! call bufload(" .. bufnr .. ")")
       -- vim.fn.bufload(bufnr)
       -- vim.notify("Loaded file: " .. file_name, vim.log.levels.DEBUG)
     end
   end
+end
+
+U.load_buffers_by_fname = function(cwd, file_names)
+  if not (type(file_names) == "table") then
+    return false
+  end
+
+  local P = require("plenary.path")
+  for _, file_name in ipairs(file_names) do
+    local file = P:new(cwd, file_name)
+    local bufnr
+    if file:is_file() then
+      bufnr = vim.fn.bufadd(file:expand())
+      -- NOTE: silent is required to avoid E325
+      vim.cmd("silent! call bufload(" .. bufnr .. ")")
+    end
+  end
+
+  return true
 end
 
 U.filter_buffers = function(buffer_handles, cwd)

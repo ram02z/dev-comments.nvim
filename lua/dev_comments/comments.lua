@@ -3,6 +3,7 @@ local C = {}
 local Files = require("dev_comments.constants").Files
 local cache = require("dev_comments.cache")
 local utils = require("dev_comments.utils")
+local filter = require("dev_comments.filter")
 
 local get_named_child_node_text = function(node, name, bufnr)
   bufnr = bufnr or 0
@@ -94,18 +95,20 @@ C.generate = function(files, opts)
   end
 
   local buffer_handles = {}
+  local config = require("dev_comments").config
   if opts.files == Files.CURRENT then
     buffer_handles = { vim.api.nvim_get_current_buf() }
   elseif opts.files == Files.OPEN then
     buffer_handles = vim.api.nvim_list_bufs()
+    if opts.cwd then
+      buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd)
+    end
   elseif opts.files == Files.ALL then
-    utils.load_buffers(opts.cwd, opts.hidden, opts.depth)
+    local filtered = filter.match(utils.filter_buffers, config.pre_filter.command, opts.cwd, opts.tags)
+    if not filtered and config.pre_filter.fallback_to_plenary then
+      utils.load_buffers_by_cwd(opts.cwd, opts.hidden, opts.depth)
+    end
     buffer_handles = vim.api.nvim_list_bufs()
-  end
-
-  -- Only filter buffers if user specifies cwd
-  if opts.cwd then
-    buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd)
   end
 
   results = {}
