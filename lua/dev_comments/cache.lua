@@ -1,6 +1,6 @@
 -- TODO: Reset the cache on InsertCharPre?
 
-C = {}
+local C = {}
 
 local Files = require("dev_comments.constants").Files
 
