@@ -1,5 +1,3 @@
--- TODO: Reset the cache on InsertCharPre?
-
 local C = {}
 
 local Files = require("dev_comments.constants").Files
@@ -49,8 +47,9 @@ C.register = function()
   if registered then
     return false
   end
+  local config = require("dev_comments").config
   local id = vim.api.nvim_create_augroup("DevComments", { clear = true })
-  vim.api.nvim_create_autocmd({ "BufWritePost", "BufWinEnter" }, {
+  vim.api.nvim_create_autocmd(config.cache.reset_autocommands, {
     callback = function()
       C.reset(Files.CURRENT)
       C.reset(Files.OPEN)

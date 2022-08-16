@@ -1,4 +1,3 @@
--- TODO: use grep to list files when using Files.ALL
 local dev_comments = {}
 
 local Files = require("dev_comments.constants").Files
@@ -8,7 +7,10 @@ dev_comments.config = {
   debug = false,
   default_mappings = true,
   default_commands = true,
-  cache = true,
+  cache = {
+    enabled = true,
+    reset_autocommands = { "BufWritePost", "BufWinEnter" },
+  },
   telescope = {
     load = true,
     [Files.CURRENT] = {
@@ -47,7 +49,7 @@ dev_comments.setup = function(config)
   if dev_comments.config.telescope.load then
     require("telescope").load_extension("dev_comments")
   end
-  if dev_comments.config.cache then
+  if dev_comments.config.cache.enabled then
     require("dev_comments.cache").register()
   end
 end
