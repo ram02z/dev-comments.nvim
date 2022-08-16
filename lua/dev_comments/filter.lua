@@ -24,6 +24,7 @@ F.match = function(command, cwd, tags)
   end
 
   cwd = vim.F.if_nil(cwd, vim.loop.cwd())
+  tags = vim.F.if_nil(tags, {})
 
   local Job = require("plenary.job")
   local FilterCommandArgs = require("dev_comments.constants").FilterCommandArgs
@@ -38,6 +39,12 @@ F.match = function(command, cwd, tags)
 
   if ret == 0 then
     return job:result()
+  elseif ret == 1 then
+    utils.notify("No matching comments found from command: " .. command, vim.log.levels.INFO)
+    return {}
+  elseif ret == 2 then
+    local error = table.concat(job:stderr_result(), "\n")
+    utils.notify("Failed with code " .. code .. ":" .. error, vim.log.levels.ERROR)
   end
 end
 
