@@ -17,30 +17,28 @@ end
 
 -- TODO: implement depth search
 -- TODO: implement hidden flag (ignores hidden directories by default)
-F.match = function(cb, command, cwd, tags)
+F.match = function(command, cwd, tags)
   if vim.fn.executable(command) ~= 1 then
     utils.notify(command .. "not found in PATH", vim.log.levels.WARN)
     return
   end
 
-  local J = require("plenary.job")
+  cwd = vim.F.if_nil(cwd, vim.loop.cwd())
+
+  local Job = require("plenary.job")
   local FilterCommandArgs = require("dev_comments.constants").FilterCommandArgs
   local pattern = create_pattern(tags)
   local args = vim.tbl_flatten({ FilterCommandArgs[command], pattern, cwd })
-  J:new({
+  local job = Job:new({
     command = command,
     args = args,
-    on_exit = vim.schedule_wrap(function(j, code)
-      if code == 2 then
-        local error = table.concat(j:stderr_result(), "\n")
-        utils.notify("Failed with code " .. code .. ":" .. error, vim.log.levels.ERROR)
-      elseif code == 1 then
-        utils.notify("No matching comments found", vim.log.levels.INFO)
-      else
-        cb(j:result(), cwd)
-      end
-    end),
-  }):start()
+  })
+
+  local _, ret = job:sync()
+
+  if ret == 0 then
+    return job:result()
+  end
 end
 
 return F

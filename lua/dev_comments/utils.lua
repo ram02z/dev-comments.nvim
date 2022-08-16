@@ -56,6 +56,7 @@ U.load_buffers_by_cwd = function(cwd, hidden, depth)
   local S = require("plenary.scandir")
   local files = S.scan_dir(cwd, { hidden = hidden, depth = depth })
 
+  local buffer_handles = {}
   local P = require("plenary.path")
   for _, file_path in ipairs(files) do
     local file = P:new(file_path)
@@ -64,29 +65,34 @@ U.load_buffers_by_cwd = function(cwd, hidden, depth)
       bufnr = vim.fn.bufadd(file:expand())
       -- NOTE: silent is required to avoid E325
       vim.cmd("silent! call bufload(" .. bufnr .. ")")
+      table.insert(buffer_handles, bufnr)
       -- vim.fn.bufload(bufnr)
       -- vim.notify("Loaded file: " .. file_name, vim.log.levels.DEBUG)
     end
   end
+
+  return buffer_handles
 end
 
-U.load_buffers_by_fname = function(cwd, file_names)
+U.load_buffers_by_fname = function(file_names)
   if not (type(file_names) == "table") then
-    return false
+    return
   end
 
+  local buffer_handles = {}
   local P = require("plenary.path")
   for _, file_name in ipairs(file_names) do
-    local file = P:new(cwd, file_name)
+    local file = P:new(file_name)
     local bufnr
     if file:is_file() then
       bufnr = vim.fn.bufadd(file:expand())
       -- NOTE: silent is required to avoid E325
       vim.cmd("silent! call bufload(" .. bufnr .. ")")
+      table.insert(buffer_handles, bufnr)
     end
   end
 
-  return true
+  return buffer_handles
 end
 
 U.filter_buffers = function(buffer_handles, cwd)

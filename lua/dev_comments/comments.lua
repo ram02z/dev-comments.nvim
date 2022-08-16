@@ -104,11 +104,13 @@ C.generate = function(files, opts)
       buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd)
     end
   elseif opts.files == Files.ALL then
-    local filtered = filter.match(utils.filter_buffers, config.pre_filter.command, opts.cwd, opts.tags)
-    if not filtered and config.pre_filter.fallback_to_plenary then
-      utils.load_buffers_by_cwd(opts.cwd, opts.hidden, opts.depth)
+    file_names = filter.match(config.pre_filter.command, opts.cwd, opts.tags)
+    -- FIXME: which cases are handled for the fallback?
+    if not file_names and config.pre_filter.fallback_to_plenary then
+      buffer_handles = utils.load_buffers_by_cwd(opts.cwd, opts.hidden, opts.depth)
+    else
+      buffer_handles = utils.load_buffers_by_fname(file_names)
     end
-    buffer_handles = vim.api.nvim_list_bufs()
   end
 
   results = {}
