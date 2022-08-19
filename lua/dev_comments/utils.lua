@@ -9,6 +9,14 @@ local comment_tag_highlight = {
   ["BUG"] = "TSDanger",
 }
 
+local bufload_file = function(file_path)
+  local bufnr = vim.fn.bufadd(file_path)
+  -- NOTE: silent is required to avoid E325
+  vim.cmd("silent! call bufload(" .. bufnr .. ")")
+
+  return bufnr
+end
+
 U.notify = function(msg, level, opts)
   local config = require("dev_comments").config
   if config.debug then
@@ -60,14 +68,9 @@ U.load_buffers_by_cwd = function(cwd, hidden, depth)
   local P = require("plenary.path")
   for _, file_path in ipairs(files) do
     local file = P:new(file_path)
-    local bufnr
     if file:is_file() then
-      bufnr = vim.fn.bufadd(file:expand())
-      -- NOTE: silent is required to avoid E325
-      vim.cmd("silent! call bufload(" .. bufnr .. ")")
+      local bufnr = bufload_file(file:expand())
       table.insert(buffer_handles, bufnr)
-      -- vim.fn.bufload(bufnr)
-      -- vim.notify("Loaded file: " .. file_name, vim.log.levels.DEBUG)
     end
   end
 
@@ -83,11 +86,8 @@ U.load_buffers_by_fname = function(file_names)
   local P = require("plenary.path")
   for _, file_name in ipairs(file_names) do
     local file = P:new(file_name)
-    local bufnr
     if file:is_file() then
-      bufnr = vim.fn.bufadd(file:expand())
-      -- NOTE: silent is required to avoid E325
-      vim.cmd("silent! call bufload(" .. bufnr .. ")")
+      local bufnr = bufload_file(file:expand())
       table.insert(buffer_handles, bufnr)
     end
   end

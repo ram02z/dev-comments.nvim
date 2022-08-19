@@ -14,7 +14,6 @@ local create_pattern = function(tags, users)
     return default_pattern
   end
 
-
   local tag_group = table.concat(tags, "|")
   local user_group = table.concat(users, "|")
   if #tags > 0 and #users > 0 then
