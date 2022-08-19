@@ -55,7 +55,7 @@ local finder = function(bufnr, results, opts)
           (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
           and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
         then
-          -- FIXME: if a comment node contains two tag nodes, it will get the text of the comment node
+          -- FIXME(ozeghouani): if a comment node contains two tag nodes, it will get the text of the comment node
           table.insert(results, {
             node = root_node,
             tag = tag,
@@ -104,7 +104,7 @@ C.generate = function(files, opts)
       buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd)
     end
   elseif opts.files == Files.ALL then
-    file_names = filter.match(config.pre_filter.command, opts.cwd, opts.tags)
+    file_names = filter.match(config.pre_filter.command, opts.cwd, opts.tags, opts.users)
     -- FIXME: which cases are handled for the fallback?
     if not file_names and config.pre_filter.fallback_to_plenary then
       buffer_handles = utils.load_buffers_by_cwd(opts.cwd, opts.hidden, opts.depth)
