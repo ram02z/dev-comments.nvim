@@ -1,7 +1,5 @@
 local U = {}
 
-local comment_tag_fallback_highlight = "TSNote"
-
 local bufload_file = function(file_path)
   local bufnr = vim.fn.bufadd(file_path)
   -- NOTE: silent is required to avoid E325
