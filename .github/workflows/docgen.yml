@@ -1,7 +1,6 @@
 name: docgen
 
 on:
-  pull_request:
   push:
     branches:
       - master
@@ -38,3 +37,4 @@ jobs:
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: "chore: update doc/dev-comments.txt"
+        file_pattern: doc/*.txt

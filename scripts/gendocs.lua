@@ -9,7 +9,7 @@ docs.test = function()
     "./lua/dev_comments/init.lua",
   }
 
-  local output_file = "./doc/telescope.txt"
+  local output_file = "./doc/dev-comments.txt"
   local output_file_handle = io.open(output_file, "w")
 
   for _, input_file in ipairs(input_files) do
