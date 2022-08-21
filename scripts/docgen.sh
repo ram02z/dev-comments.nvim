@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Build parser
-cd ./tree-sitter-lua
+cd ../tree-sitter-lua
 make dist
 cd -
 

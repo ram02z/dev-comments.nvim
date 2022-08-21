@@ -1,4 +1,4 @@
-require("dev_comments").setup()
+require("dev_comments").setup({ telescope = { load = false } })
 
 local docgen = require("docgen")
 
