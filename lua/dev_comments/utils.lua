@@ -43,7 +43,7 @@ end
 U.get_text_by_range = function(range, bufnr)
   local lines
   local eof_row = vim.api.nvim_buf_line_count(bufnr)
-  if range.start_row >= eof_row then return nil end
+  if range.start_row >= eof_row then return "" end
 
   if range.end_col == 0 then
     lines = vim.api.nvim_buf_get_lines(bufnr, range.start_row, range.end_row, true)
@@ -58,9 +58,10 @@ U.get_text_by_range = function(range, bufnr)
     else
       lines[1] = string.sub(lines[1], range.start_col + 1)
     end
+    return lines[1]
   end
 
-  return lines[1]
+  return ""
 end
 
 U.load_buffers_by_cwd = function(cwd, hidden, depth)
