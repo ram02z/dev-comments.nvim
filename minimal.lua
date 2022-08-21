@@ -34,7 +34,7 @@ local function load_plugins()
     {
       "wbthomason/packer.nvim",
       {
-        "dev-comments.nvim",
+        "ram02z/dev-comments.nvim",
         requires = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim" },
         config = dev_comments_config,
       },
