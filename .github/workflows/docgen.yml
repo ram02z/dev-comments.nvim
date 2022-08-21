@@ -17,13 +17,8 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          repository: nvim-lua/plenary.nvim
-          path: plenary.nvim
-
-      - uses: actions/checkout@v2
-        with:
-          repository: tjdevries/tree-sitter-lua
-          path: tree-sitter-lua
+          repository: echasnovski/mini.nvim
+          path: mini.nvim
 
       - uses: rhysd/action-setup-vim@v1
         with:
@@ -39,3 +34,5 @@ jobs:
           commit_message: "chore: update doc/dev-comments.txt"
           file_pattern: doc/*.txt
           repository: dev-comments.nvim
+          add_options: "-f"
+          skip_dirty_check: true

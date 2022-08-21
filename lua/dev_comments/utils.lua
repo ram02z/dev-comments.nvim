@@ -8,9 +8,9 @@ local bufload_file = function(file_path)
   return bufnr
 end
 
-U.notify = function(msg, level, opts)
+U.notify = function(...)
   local config = require("dev_comments").config
-  if config.debug then vim.notify(msg, level, opts) end
+  if config.debug then vim.notify(...) end
 end
 
 U.get_highlight_by_tag = function(tag, fallback)
@@ -105,8 +105,8 @@ U.filter_buffers = function(buffer_handles, cwd)
   end, buffer_handles)
 end
 
-U.split = function(string, sep, opts)
-  local ok, result = pcall(vim.split, string, sep, opts)
+U.split = function(...)
+  local ok, result = pcall(vim.split, ...)
   if not ok then return nil end
   return result
 end
