@@ -134,12 +134,4 @@ U.split = function(...)
   return result
 end
 
-U.split_at_first_occurance = function(s, sep)
-  local t = vim.split(s, sep, { trimempty = true })
-  if #t == 0 then return s end
-
-  s = table.concat(t, "", 2, #t)
-  return vim.split(s, "\n")[1]
-end
-
 return U
