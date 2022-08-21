@@ -105,6 +105,12 @@ U.filter_buffers = function(buffer_handles, cwd)
   end, buffer_handles)
 end
 
+U.split = function(string, sep, opts)
+  local ok, result = pcall(vim.split, string, sep, opts)
+  if not ok then return nil end
+  return result
+end
+
 U.split_at_first_occurance = function(s, sep)
   local t = vim.split(s, sep, { trimempty = true })
   if #t == 0 then return s end

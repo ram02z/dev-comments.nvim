@@ -76,18 +76,18 @@ dev_comments.config = {
   telescope = {
     load = true,
     [Files.CURRENT] = {
-      tags = "",
-      users = "",
+      tags = {},
+      users = {},
     },
     [Files.OPEN] = {
-      tags = "",
-      users = "",
+      tags = {},
+      users = {},
     },
     [Files.ALL] = {
       hidden = false,
       depth = 3,
-      tags = "",
-      users = "",
+      tags = {},
+      users = {},
     },
   },
   cycle = {

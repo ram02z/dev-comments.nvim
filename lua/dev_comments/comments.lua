@@ -71,8 +71,8 @@ local set_opts = function(files, opts)
   if opts.cwd ~= nil then opts.cwd = vim.fn.expand(opts.cwd) end
   opts.hidden = vim.F.if_nil(opts.hidden, config.telescope[files].hidden)
   opts.depth = vim.F.if_nil(opts.depth, config.telescope[files].depth)
-  opts.tags = vim.split(opts.tags or config.telescope[files].tags, ",", { trimempty = true })
-  opts.users = vim.split(opts.users or config.telescope[files].users, ",", { trimempty = true })
+  opts.tags = utils.split(opts.tags, ",", { trimempty = true }) or config.telescope[files].tags
+  opts.users = utils.split(opts.users, ",", { trimempty = true }) or config.telescope[files].users
 end
 
 C.generate = function(files, opts)
