@@ -1,0 +1,99 @@
+==============================================================================
+------------------------------------------------------------------------------
+Table of contents:
+  Abstract......................................................|dev-comments|
+  The setup function....................................|dev_comments.setup()|
+  Configure the setup.............................|dev-comments-configuration|
+
+
+------------------------------------------------------------------------------
+                                                                  *dev-comments*
+# Abstract~
+
+*dev-comments.nvim* is a plugin that uses the tree-sitter-comment parser to
+list and search for dev comments
+
+Author: Omar Zeghouani
+License: MIT
+
+
+------------------------------------------------------------------------------
+                                                          *dev_comments.setup()*
+                         `dev_comments.setup`({config})
+Module setup
+
+Parameters~
+{config} `(table|nil)` configuration options. See |dev-comments-configuration|
+
+Usage~
+`require("dev_comments").setup({})` (replace `{}` with your `config` table)
+
+------------------------------------------------------------------------------
+                                                    *dev-comments-configuration*
+# Configuration~
+
+Default values:
+>
+  {
+    -- Enables vim.notify messages
+    debug = false,
+    -- Creates <Plug> mappings
+    default_mappings = true,
+    -- Create user commands
+    default_commands = true,
+    -- Each call of dev-comments is cached
+    -- Play around with the reset autocommands for more aggressive caching
+    cache = {
+      enabled = true,
+      reset_autocommands = { "BufWritePost", "BufWinEnter" },
+    },
+    -- Loads and sets default options for telescope plugin
+    telescope = {
+      load = true,
+      -- require("dev_comments.constants").Files
+      [Files.CURRENT] = {
+        tags = {},
+        users = {},
+      },
+      [Files.OPEN] = {
+        tags = {},
+        users = {},
+      },
+      [Files.ALL] = {
+        hidden = false,
+        depth = 3,
+        tags = {},
+        users = {},
+      },
+    },
+    -- Cycle through dev-comments in a given buffer
+    -- Caching is recommended for this feature
+    cycle = {
+      wrap = true,
+    },
+    -- Improves performance when searching in a large directory
+    -- Requires ripgrep or grep
+    pre_filter = {
+      -- require("dev_comments.constants").FilterCommand
+      command = FilterCommand.RIPGREP,
+      -- If search fails, uses plenary scandir (very slow)
+      fallback_to_plenary = true,
+    },
+    -- Highlight for the tag in picker (not in buffer)
+    highlight = {
+      tags = {
+        ["TODO"] = "TSWarning",
+        ["HACK"] = "TSWarning",
+        ["WARNING"] = "TSWarning",
+        ["FIXME"] = "TSDanger",
+        ["XXX"] = "TSDanger",
+        ["BUG"] = "TSDanger",
+      },
+      -- Used if lookup fails for a given tag
+      fallback = "TSNote",
+    },
+  }
+<
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
