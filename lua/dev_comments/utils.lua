@@ -9,6 +9,8 @@ local comment_tag_highlight = {
   ["BUG"] = "TSDanger",
 }
 
+local comment_tag_fallback_highlight = "TSNote"
+
 local bufload_file = function(file_path)
   local bufnr = vim.fn.bufadd(file_path)
   -- NOTE: silent is required to avoid E325
@@ -22,9 +24,9 @@ U.notify = function(msg, level, opts)
   if config.debug then vim.notify(msg, level, opts) end
 end
 
-U.get_highlight_by_tag = function(tag)
+U.get_highlight_by_tag = function(tag, fallback)
   local hl_name = comment_tag_highlight[tag]
-  if not hl_name then hl_name = "TSNote" end
+  if not hl_name then hl_name = vim.F.if_nil(fallback, comment_tag_fallback_highlight) end
 
   return hl_name
 end
