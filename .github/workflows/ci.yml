@@ -31,6 +31,6 @@ jobs:
         with:
           neovim: true
           version: nightly
-      - run: nvim --headless --noplugin -u minimal.lua -c "lua require(\"plenary.test_harness\").test_directory_command('test {minimal_init = \"/minimal.lua\"}')"
+      - run: make test
         working-directory: dev-comments.nvim
         timeout-minutes: 1
