@@ -40,6 +40,29 @@ U.get_node_text = function(node, bufnr)
   return vim.treesitter.get_node_text(node, bufnr)
 end
 
+U.get_text_by_range = function(range, bufnr)
+  local lines
+  local eof_row = vim.api.nvim_buf_line_count(bufnr)
+  if range.start_row >= eof_row then return nil end
+
+  if range.end_col == 0 then
+    lines = vim.api.nvim_buf_get_lines(bufnr, range.start_row, range.end_row, true)
+    range.end_col = -1
+  else
+    lines = vim.api.nvim_buf_get_lines(bufnr, range.start_row, range.end_row + 1, true)
+  end
+
+  if #lines > 0 then
+    if #lines == 1 then
+      lines[1] = string.sub(lines[1], range.start_col + 1, range.end_col)
+    else
+      lines[1] = string.sub(lines[1], range.start_col + 1)
+    end
+  end
+
+  return lines[1]
+end
+
 U.load_buffers_by_cwd = function(cwd, hidden, depth)
   cwd = cwd or vim.loop.cwd()
   hidden = vim.F.if_nil(hidden, false)

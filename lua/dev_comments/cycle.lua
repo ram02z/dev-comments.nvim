@@ -27,7 +27,7 @@ local function next_dev_comment(wrap, opts, forward)
   local node_row, node_col
   for i = start_i, end_i, inc_i do
     local entry = results[i]
-    node_row, node_col = entry.node:range()
+    node_row, node_col = entry.range.start_row, entry.range.start_col
     node_row = node_row + 1
     if forward and row < node_row then
       return { node_row, node_col }
@@ -39,9 +39,9 @@ local function next_dev_comment(wrap, opts, forward)
   if wrap then
     utils.notify("Reached the last node. Wrapping around.", vim.log.levels.INFO)
     if forward then
-      node_row, node_col = results[1].node:range()
+      node_row, node_col = results[1].range.start_row, results[1].range.start_col
     else
-      node_row, node_col = results[#results].node:range()
+      node_row, node_col = results[#results].range.start_row, results[#results].range.start_col
     end
     node_row = node_row + 1
 
