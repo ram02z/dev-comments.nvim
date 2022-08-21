@@ -1,0 +1,39 @@
+name: docgen
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  docgen:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: dev-comments.nvim
+
+    - uses: actions/checkout@v2
+      with:
+        repository: nvim-lua/plenary.nvim
+        path: plenary.nvim
+
+    - uses: actions/checkout@v2
+      with:
+        repository: tjdevries/tree-sitter-lua
+        path: tree-sitter-lua
+
+    - uses: rhysd/action-setup-vim@v1
+      with:
+        neovim: true
+        version: nightly
+
+    - name: Run docgen
+      run: make docgen
+
+    - name: Commit changes
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "chore: update doc/dev-comments.txt"
