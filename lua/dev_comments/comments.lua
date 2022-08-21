@@ -72,6 +72,9 @@ end
 
 local set_opts = function(files, opts)
   local config = require("dev_comments").config
+  if opts.cwd ~= nil then
+    opts.cwd = vim.fn.expand(opts.cwd)
+  end
   opts.hidden = vim.F.if_nil(opts.hidden, config.telescope[files].hidden)
   opts.depth = vim.F.if_nil(opts.depth, config.telescope[files].depth)
   opts.tags = vim.split(opts.tags or config.telescope[files].tags, ",", { trimempty = true })
