@@ -19,16 +19,12 @@ end
 
 U.notify = function(msg, level, opts)
   local config = require("dev_comments").config
-  if config.debug then
-    vim.notify(msg, level, opts)
-  end
+  if config.debug then vim.notify(msg, level, opts) end
 end
 
 U.get_highlight_by_tag = function(tag)
   local hl_name = comment_tag_highlight[tag]
-  if not hl_name then
-    hl_name = "TSNote"
-  end
+  if not hl_name then hl_name = "TSNote" end
 
   return hl_name
 end
@@ -38,9 +34,7 @@ U.get_filename_fn = function()
   return function(bufnr)
     bufnr = vim.F.if_nil(bufnr, 0)
     local c = bufnr_name_cache[bufnr]
-    if c then
-      return c
-    end
+    if c then return c end
 
     local n = vim.api.nvim_buf_get_name(bufnr)
     bufnr_name_cache[bufnr] = n
@@ -49,9 +43,7 @@ U.get_filename_fn = function()
 end
 
 U.get_node_text = function(node, bufnr)
-  if not node then
-    return ""
-  end
+  if not node then return "" end
 
   return vim.treesitter.get_node_text(node, bufnr)
 end
@@ -78,9 +70,7 @@ U.load_buffers_by_cwd = function(cwd, hidden, depth)
 end
 
 U.load_buffers_by_fname = function(file_names)
-  if not (type(file_names) == "table") then
-    return
-  end
+  if not (type(file_names) == "table") then return end
 
   local buffer_handles = {}
   local P = require("plenary.path")
@@ -125,9 +115,7 @@ end
 
 U.split_at_first_occurance = function(s, sep)
   local t = vim.split(s, sep, { trimempty = true })
-  if #t == 0 then
-    return s
-  end
+  if #t == 0 then return s end
 
   s = table.concat(t, "", 2, #t)
   return vim.split(s, "\n")[1]

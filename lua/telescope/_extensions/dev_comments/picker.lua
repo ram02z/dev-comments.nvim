@@ -6,9 +6,7 @@ local comments = require("dev_comments.comments")
 local utils = require("dev_comments.utils")
 
 local create = function(results, opts)
-  if vim.tbl_isempty(results) then
-    utils.notify("No dev comments found", vim.log.levels.INFO)
-  end
+  if vim.tbl_isempty(results) then utils.notify("No dev comments found", vim.log.levels.INFO) end
 
   local conf = require("telescope.config").values
   local finders = require("telescope.finders")

@@ -15,26 +15,18 @@ local hash_func = function(opts)
 end
 
 C.add = function(entries, opts)
-  if not registered then
-    return false
-  end
+  if not registered then return false end
   local hash = hash_func(opts)
-  if not opts.files then
-    return false
-  end
+  if not opts.files then return false end
 
   cache[opts.files][hash] = entries
   return true
 end
 
 C.get = function(opts)
-  if not registered then
-    return nil
-  end
+  if not registered then return nil end
   local hash = hash_func(opts)
-  if not opts.files then
-    return nil
-  end
+  if not opts.files then return nil end
   return cache[opts.files][hash]
 end
 
@@ -44,9 +36,7 @@ C.reset = function(files_opt)
 end
 
 C.register = function()
-  if registered then
-    return false
-  end
+  if registered then return false end
   local config = require("dev_comments").config
   local id = vim.api.nvim_create_augroup("DevComments", { clear = true })
   vim.api.nvim_create_autocmd(config.cache.reset_autocommands, {
@@ -62,9 +52,7 @@ C.register = function()
 end
 
 C.unregister = function()
-  if not registered then
-    return false
-  end
+  if not registered then return false end
   vim.api.nvim_del_augroup_by_name("DevComments")
   registered = false
   return true

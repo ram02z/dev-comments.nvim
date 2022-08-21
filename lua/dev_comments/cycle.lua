@@ -9,9 +9,7 @@ local function next_dev_comment(wrap, opts, forward)
 
   -- assumes results are in ascending line order
   local results = comments.generate("current", opts)
-  if #results == 0 then
-    return
-  end
+  if #results == 0 then return end
 
   local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
 

@@ -34,9 +34,7 @@ P.set_default_commands = function()
   end, {})
   vim.api.nvim_create_user_command("DevCommentsCacheToggle", function()
     local registered = cache.unregister()
-    if not registered then
-      cache.register()
-    end
+    if not registered then cache.register() end
   end, {})
   vim.api.nvim_create_user_command("DevCommentsCacheDisable", function()
     cache.unregister()

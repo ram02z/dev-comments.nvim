@@ -40,18 +40,10 @@ dev_comments.config = {
 dev_comments.setup = function(config)
   config = config or {}
   dev_comments.config = vim.tbl_extend("force", dev_comments.config, config)
-  if dev_comments.config.default_mappings then
-    require("dev_comments.presets").set_default_mappings()
-  end
-  if dev_comments.config.default_commands then
-    require("dev_comments.presets").set_default_commands()
-  end
-  if dev_comments.config.telescope.load then
-    require("telescope").load_extension("dev_comments")
-  end
-  if dev_comments.config.cache.enabled then
-    require("dev_comments.cache").register()
-  end
+  if dev_comments.config.default_mappings then require("dev_comments.presets").set_default_mappings() end
+  if dev_comments.config.default_commands then require("dev_comments.presets").set_default_commands() end
+  if dev_comments.config.telescope.load then require("telescope").load_extension("dev_comments") end
+  if dev_comments.config.cache.enabled then require("dev_comments.cache").register() end
 end
 
 return dev_comments

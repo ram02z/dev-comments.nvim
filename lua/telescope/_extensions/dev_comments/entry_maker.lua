@@ -33,9 +33,7 @@ local entry_maker = function(opts)
 
   local get_filename = utils.get_filename_fn()
   return function(entry)
-    if not vim.api.nvim_buf_is_loaded(entry.bufnr) then
-      return
-    end
+    if not vim.api.nvim_buf_is_loaded(entry.bufnr) then return end
     local make_entry = require("telescope.make_entry")
     local start_row, start_col, end_row, _ = entry.node:range()
     local node_text = utils.get_node_text(entry.node, entry.bufnr)

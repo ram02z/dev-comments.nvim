@@ -10,9 +10,7 @@ local user_pattern = [[\b([A-Z]+)(\((%s)\)): ]]
 local full_pattern = [[\b(%s)(\((%s)\)): ]]
 
 local create_pattern = function(tags, users)
-  if #tags == 0 and #users == 0 then
-    return default_pattern
-  end
+  if #tags == 0 and #users == 0 then return default_pattern end
 
   local tag_group = table.concat(tags, "|")
   local user_group = table.concat(users, "|")
