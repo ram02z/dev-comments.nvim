@@ -14,12 +14,16 @@
 
 ## Requirements
 
+### Core
+
 - Neovim >= 0.7.0
 
 ### Optional
 
   - [ripgrep](https://github.com/BurntSushi/ripgrep) 
-  OR
+
+  *OR*
+
   - [grep](https://www.gnu.org/software/grep/manual/grep.html)
 
   > Highly recommended if you use the `all` file mode
@@ -36,7 +40,7 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim' " optional for picker
 
 lua << EOF
-require("dev-comments").setup({
+require("dev_comments").setup({
   -- configuration
   -- leave empty for defaults
 })
@@ -47,9 +51,13 @@ EOF
 ```lua
 use({
   "ram02z/dev-comments.nvim",
-  requires = {"nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
+  requires = {
+    "nvim-treesitter/nvim-treesitter",
+    "nvim-lua/plenary.nvim",
+    "nvim-telescope/nvim-telescope", -- optional
+  },
   config = function()
-      require("dev-comments").setup({
+      require("dev_comments").setup({
       -- configuration
       -- leave empty for defaults
     })
@@ -59,7 +67,7 @@ use({
 
 Ensure you have the `tree-sitter-comment` installed in Neovim
 
-`:TSInstall comment<CR>`
+Run `:TSInstall comment<CR>`
 
 ## Configuration
 
@@ -83,11 +91,11 @@ The main options are:
 - `tags`: filters the search by tags i.e. `<TAG>: `
   - Default: all tags
   - Use `table<string>` if using the API directly
-  - Comma separated strings if you using the commands
+  - Use comma separated strings if you using the commands, i.e. `tags=TODO`
 - `users` : filters the search by user i.e. `<TAG>(<USER>):`
   - Default: all users 
   - Use `table<string>` if using the API directly
-  - Comma separated strings if you using the commands
+  - Use comma separated strings if you using the commands, i.e. `users=ram02z,foo`
 
 ### Telescope
 
