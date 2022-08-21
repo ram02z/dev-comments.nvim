@@ -2,7 +2,6 @@ local utils = require("dev_comments.utils")
 local mock = require("luassert.mock")
 
 describe("utils", function()
-
   local notify
   local config = require("dev_comments").config
   before_each(function()
@@ -36,13 +35,13 @@ describe("utils", function()
     assert.equals("", text)
   end)
 
-  it("gets fallback highlight from config if tag and fallback are not found", function ()
+  it("gets fallback highlight from config if tag and fallback are not found", function()
     local fallback = config.highlight.fallback
     local hlname = utils.get_highlight_by_tag(nil, nil)
     assert(hlname, fallback)
   end)
 
-  it("gets fallback highlight from param if tag is not found", function ()
+  it("gets fallback highlight from param if tag is not found", function()
     local fallback = "test"
     local hlname = utils.get_highlight_by_tag(nil, fallback)
     assert(hlname, fallback)
