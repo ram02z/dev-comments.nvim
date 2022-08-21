@@ -1,0 +1,9 @@
+================================================================================
+INTRODUCTION                                                 *dev_comments.nvim*
+
+dev-comments.nvim is a plugin that uses the tree-sitter-comment parser to list
+and search for dev comments
+
+
+
+ vim:tw=78:ts=8:ft=help:norl:
