@@ -15,7 +15,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           # CLI arguments
-          args: --color always --check lua/
+          args: --color always --check .
   busted:
     name: tests
     runs-on: ubuntu-20.04
