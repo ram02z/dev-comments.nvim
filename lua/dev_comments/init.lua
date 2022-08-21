@@ -35,6 +35,17 @@ dev_comments.config = {
     command = FilterCommand.RIPGREP,
     fallback_to_plenary = true,
   },
+  highlight = {
+    tags = {
+      ["TODO"] = "TSWarning",
+      ["HACK"] = "TSWarning",
+      ["WARNING"] = "TSWarning",
+      ["FIXME"] = "TSDanger",
+      ["XXX"] = "TSDanger",
+      ["BUG"] = "TSDanger",
+    },
+    fallback = "TSNote",
+  },
 }
 
 dev_comments.setup = function(config)

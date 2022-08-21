@@ -1,14 +1,5 @@
 local U = {}
 
-local comment_tag_highlight = {
-  ["TODO"] = "TSWarning",
-  ["HACK"] = "TSWarning",
-  ["WARNING"] = "TSWarning",
-  ["FIXME"] = "TSDanger",
-  ["XXX"] = "TSDanger",
-  ["BUG"] = "TSDanger",
-}
-
 local comment_tag_fallback_highlight = "TSNote"
 
 local bufload_file = function(file_path)
@@ -25,8 +16,9 @@ U.notify = function(msg, level, opts)
 end
 
 U.get_highlight_by_tag = function(tag, fallback)
-  local hl_name = comment_tag_highlight[tag]
-  if not hl_name then hl_name = vim.F.if_nil(fallback, comment_tag_fallback_highlight) end
+  local config = require("dev_comments").config
+  local hl_name = config.highlight.tags[tag]
+  if not hl_name then hl_name = vim.F.if_nil(fallback, config.highlight.fallback) end
 
   return hl_name
 end
