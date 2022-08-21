@@ -4,6 +4,9 @@ Table of contents:
   Abstract......................................................|dev-comments|
   The setup function....................................|dev_comments.setup()|
   Configure the setup.............................|dev-comments-configuration|
+  Default mappings.............................|dev-comments-default-mappings|
+  Default commands.............................|dev-comments-default-commands|
+  Telecope integration................................|dev-comments-telescope|
 
 
 ------------------------------------------------------------------------------
@@ -94,6 +97,83 @@ Default values:
     },
   }
 <
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                 *dev-comments-default-mappings*
+
+# Default mappings~
+
+dev-comments.nvim comes with optional default mappings and commands
+
+>
+  function()
+    -- <Plug> keymaps
+    vim.keymap.set("n", "<Plug>DevCommentsTelescopeCurrent", function()
+      require("telecope").extensions.dev_comments.current({})
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsTelescopeOpen", function()
+      require("telecope").extensions.dev_comments.open({})
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsTelescopeAll", function()
+      require("telecope").extensions.dev_comments.open({})
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsCyclePrev", function()
+      require("dev_comments.cycle").goto_prev()
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsCycleNext", function()
+      require("dev_comments.cycle").goto_next()
+    end, { silent = true })
+
+    -- Keybinds
+    vim.keymap.set("n", "[c", "<Plug>DevCommentsCyclePrev")
+    vim.keymap.set("n", "]c", "<Plug>DevCommentsCycleNext")
+  end
+<
+
+------------------------------------------------------------------------------
+                                                 *dev-comments-default-commands*
+
+# Default commands~
+
+>
+  function()
+    local Files = require("dev_comments.constants").Files
+    local cache = require("dev_comments.cache")
+    vim.api.nvim_create_user_command("DevCommentsCacheReset", function()
+      cache.reset(Files.CURRENT)
+      cache.reset(Files.OPEN)
+      cache.reset(Files.ALL)
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCacheToggle", function()
+      local registered = cache.unregister()
+      if not registered then cache.register() end
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCacheDisable", function()
+      cache.unregister()
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCacheEnable", function()
+      cache.register()
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCyclePrev", function()
+      require("dev_comments.cycle").goto_prev()
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCycleNext", function()
+      require("dev_comments.cycle").goto_next()
+    end, {})
+  end
+<
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                        *dev-comments-telescope*
+
+# Telescope~
+
+dev-comments.nvim comes with first class telescope integration
+
 
 
  vim:tw=78:ts=8:noet:ft=help:norl:
