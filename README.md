@@ -65,7 +65,7 @@ use({
 })
 ```
 
-Ensure you have the `tree-sitter-comment` installed in Neovim
+Ensure you have the `tree-sitter-comment` parser installed in Neovim
 
 Run `:TSInstall comment<CR>`
 
@@ -105,8 +105,8 @@ Either set the `telescope.load` to `true` in the configuration or load the exten
 require("telescope").load_extension("dev_comments")
 ```
 
-You should be able to access the three file modes (`all`, `current` and `open`)
-by running `:Telescope dev_comments <file-mode>`
+The three file modes `all`, `current` and `open` are available by running 
+`:Telescope dev_comments <file-mode><CR>`
 
 For more information, run `:help dev-comments-telescope<CR>`
 
