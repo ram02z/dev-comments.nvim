@@ -18,6 +18,21 @@ local get_named_child_node_text = function(node, name, bufnr)
   return node_text
 end
 
+local function sort_results(result)
+  local t = {}
+  for _, v in pairs(result) do
+    table.insert(t, v)
+  end
+
+  table.sort(t, function(a, b)
+    if a.range.start_row ~= b.range.start_row then return a.range.start_row < a.range.start_row end
+
+    return a.range.start_col < a.range.start_col
+  end)
+
+  return t
+end
+
 -- Returns table of nodes parsed by "comment" parser
 --
 -- @param bufnr: the buffer handle
@@ -47,6 +62,10 @@ local finder = function(bufnr, results, opts)
     for i = root_node:named_child_count() - 1, 0, -1 do
       local child_node = root_node:named_child(i)
       local child_end_row, child_end_col = child_node:end_()
+      if child_end_col > end_col then
+        local line = vim.api.nvim_buf_get_lines(bufnr, child_end_row, child_end_row + 1, false)
+        if line[1] then end_col = #line[1] end
+      end
       local range = { start_row = child_end_row, start_col = child_end_col, end_row = end_row, end_col = end_col }
       end_row, end_col = child_node:start()
       if child_node:named() and child_node:type() == "tag" then
@@ -68,7 +87,7 @@ local finder = function(bufnr, results, opts)
     end
   end)
 
-  return results
+  return sort_results(results)
 end
 
 local set_opts = function(files, opts)

@@ -18,6 +18,7 @@ local create = function(results, opts)
         results = results,
         entry_maker = opts.entry_maker or entry_maker(opts),
       }),
+      -- FIXME: ranges for the comments are incorrect
       previewer = conf.grep_previewer(opts),
       sorter = conf.prefilter_sorter({
         tag = "tag",
