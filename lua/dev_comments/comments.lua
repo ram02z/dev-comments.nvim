@@ -62,6 +62,7 @@ local finder = function(bufnr, results, opts)
     for i = root_node:named_child_count() - 1, 0, -1 do
       local child_node = root_node:named_child(i)
       local child_end_row, child_end_col = child_node:end_()
+      -- NOTE: Assumes that this node spans till the end of the line
       if child_end_col > end_col then
         local line = vim.api.nvim_buf_get_lines(bufnr, child_end_row, child_end_row + 1, false)
         if line[1] then end_col = #line[1] end
