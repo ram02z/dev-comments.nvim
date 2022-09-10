@@ -1,3 +1,11 @@
+---
+--- # Telescope~
+---
+--- dev-comments.nvim comes with first class telescope integration
+---
+---@tag dev-comments-telescope
+---@toc_entry Telecope integration
+
 local has_telescope, telescope = pcall(require, "telescope")
 local picker = require("telescope._extensions.dev_comments.picker")
 

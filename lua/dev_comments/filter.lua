@@ -3,10 +3,9 @@ local F = {}
 local utils = require("dev_comments.utils")
 
 -- Greedy pattern capture all uppercase "dev" comments
--- TODO: comment parser doesn't care about trailing space
-local default_pattern = [[\b([A-Z]+)(\((.*?)\))?: ]]
+local default_pattern = [[\b([A-Z-_]+)(\((.*?)\))?: ]]
 local tag_pattern = [[\b(%s)(\((.*?)\))?: ]]
-local user_pattern = [[\b([A-Z]+)(\((%s)\)): ]]
+local user_pattern = [[\b([A-Z-_]+)(\((%s)\)): ]]
 local full_pattern = [[\b(%s)(\((%s)\)): ]]
 
 local create_pattern = function(tags, users)
@@ -53,7 +52,7 @@ F.match = function(command, cwd, tags, users)
     return {}
   elseif ret == 2 then
     local error = table.concat(job:stderr_result(), "\n")
-    utils.notify("Failed with code " .. code .. ":" .. error, vim.log.levels.ERROR)
+    utils.notify("Failed with code " .. ret .. ":" .. error, vim.log.levels.ERROR)
   end
 end
 

@@ -1,0 +1,179 @@
+==============================================================================
+------------------------------------------------------------------------------
+Table of contents:
+  Abstract......................................................|dev-comments|
+  The setup function....................................|dev_comments.setup()|
+  Configure the setup.............................|dev-comments-configuration|
+  Default mappings.............................|dev-comments-default-mappings|
+  Default commands.............................|dev-comments-default-commands|
+  Telecope integration................................|dev-comments-telescope|
+
+
+------------------------------------------------------------------------------
+                                                                  *dev-comments*
+# Abstract~
+
+*dev-comments.nvim* is a plugin that uses the tree-sitter-comment parser to
+list and search for dev comments
+
+Author: Omar Zeghouani
+License: MIT
+
+
+------------------------------------------------------------------------------
+                                                          *dev_comments.setup()*
+                         `dev_comments.setup`({config})
+Module setup
+
+Parameters~
+{config} `(table|nil)` configuration options. See |dev-comments-configuration|
+
+Usage~
+`require("dev_comments").setup({})` (replace `{}` with your `config` table)
+
+------------------------------------------------------------------------------
+                                                    *dev-comments-configuration*
+# Configuration~
+
+Default values:
+>
+  {
+    -- Enables vim.notify messages
+    debug = false,
+    -- Creates <Plug> mappings
+    default_mappings = true,
+    -- Create user commands
+    default_commands = true,
+    -- Each call of dev-comments is cached
+    -- Play around with the reset autocommands for more aggressive caching
+    cache = {
+      enabled = true,
+      reset_autocommands = { "BufWritePost", "BufWinEnter" },
+    },
+    -- Loads and sets default options for telescope plugin
+    telescope = {
+      load = true,
+      -- require("dev_comments.constants").Files
+      [Files.CURRENT] = {
+        tags = {},
+        users = {},
+      },
+      [Files.OPEN] = {
+        tags = {},
+        users = {},
+      },
+      [Files.ALL] = {
+        hidden = false,
+        depth = 3,
+        tags = {},
+        users = {},
+      },
+    },
+    -- Cycle through dev-comments in a given buffer
+    -- Caching is recommended for this feature
+    cycle = {
+      wrap = true,
+    },
+    -- Improves performance when searching in a large directory
+    -- Requires ripgrep or grep
+    pre_filter = {
+      -- require("dev_comments.constants").FilterCommand
+      command = FilterCommand.RIPGREP,
+      -- If search fails, uses plenary scandir (very slow)
+      fallback_to_plenary = true,
+    },
+    -- Highlight for the tag in picker (not in buffer)
+    highlight = {
+      tags = {
+        ["TODO"] = "TSWarning",
+        ["HACK"] = "TSWarning",
+        ["WARNING"] = "TSWarning",
+        ["FIXME"] = "TSDanger",
+        ["XXX"] = "TSDanger",
+        ["BUG"] = "TSDanger",
+      },
+      -- Used if lookup fails for a given tag
+      fallback = "TSNote",
+    },
+  }
+<
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                 *dev-comments-default-mappings*
+
+# Default mappings~
+
+dev-comments.nvim comes with optional default mappings and commands
+
+>
+  function()
+    -- <Plug> keymaps
+    vim.keymap.set("n", "<Plug>DevCommentsTelescopeCurrent", function()
+      require("telecope").extensions.dev_comments.current({})
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsTelescopeOpen", function()
+      require("telecope").extensions.dev_comments.open({})
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsTelescopeAll", function()
+      require("telecope").extensions.dev_comments.open({})
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsCyclePrev", function()
+      require("dev_comments.cycle").goto_prev()
+    end, { silent = true })
+    vim.keymap.set("n", "<Plug>DevCommentsCycleNext", function()
+      require("dev_comments.cycle").goto_next()
+    end, { silent = true })
+
+    -- Keybinds
+    vim.keymap.set("n", "[c", "<Plug>DevCommentsCyclePrev")
+    vim.keymap.set("n", "]c", "<Plug>DevCommentsCycleNext")
+  end
+<
+
+------------------------------------------------------------------------------
+                                                 *dev-comments-default-commands*
+
+# Default commands~
+
+>
+  function()
+    local Files = require("dev_comments.constants").Files
+    local cache = require("dev_comments.cache")
+    vim.api.nvim_create_user_command("DevCommentsCacheReset", function()
+      cache.reset(Files.CURRENT)
+      cache.reset(Files.OPEN)
+      cache.reset(Files.ALL)
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCacheToggle", function()
+      local registered = cache.unregister()
+      if not registered then cache.register() end
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCacheDisable", function()
+      cache.unregister()
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCacheEnable", function()
+      cache.register()
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCyclePrev", function()
+      require("dev_comments.cycle").goto_prev()
+    end, {})
+    vim.api.nvim_create_user_command("DevCommentsCycleNext", function()
+      require("dev_comments.cycle").goto_next()
+    end, {})
+  end
+<
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                        *dev-comments-telescope*
+
+# Telescope~
+
+dev-comments.nvim comes with first class telescope integration
+
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

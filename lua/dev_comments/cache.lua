@@ -30,9 +30,8 @@ C.get = function(opts)
   return cache[opts.files][hash]
 end
 
--- TODO: check if files_opt is actually an option?
 C.reset = function(files_opt)
-  cache[files_opt] = {}
+  if cache[files_opt] ~= nil then cache[files_opt] = {} end
 end
 
 C.register = function()
