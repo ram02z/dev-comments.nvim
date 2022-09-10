@@ -50,8 +50,7 @@ local entry_maker = function(opts)
       -- need to add one since the previewer subtracts one
       lnum = entry.range.start_row + 1,
       col = entry.range.start_col,
-      start = entry.range.start_row,
-      finish = entry.range.end_row,
+      finish = entry.range.end_col,
       text = node_text,
     }, opts)
   end

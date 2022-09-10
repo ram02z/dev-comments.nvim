@@ -19,7 +19,7 @@ local create = function(results, opts)
         entry_maker = opts.entry_maker or entry_maker(opts),
       }),
       -- FIXME: ranges for the comments are incorrect
-      previewer = conf.grep_previewer(opts),
+      previewer = require("telescope._extensions.dev_comments.previewer")(opts),
       sorter = conf.prefilter_sorter({
         tag = "tag",
         sorter = conf.generic_sorter(opts),
