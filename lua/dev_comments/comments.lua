@@ -18,6 +18,21 @@ local get_named_child_node_text = function(node, name, bufnr)
   return node_text
 end
 
+local function sort_results(result)
+  local t = {}
+  for _, v in pairs(result) do
+    table.insert(t, v)
+  end
+
+  table.sort(t, function(a, b)
+    if a.range.start_row ~= b.range.start_row then return a.range.start_row < a.range.start_row end
+
+    return a.range.start_col < a.range.start_col
+  end)
+
+  return t
+end
+
 -- Returns table of nodes parsed by "comment" parser
 --
 -- @param bufnr: the buffer handle
@@ -43,7 +58,17 @@ local finder = function(bufnr, results, opts)
 
   comment_lang_tree:for_each_tree(function(tree)
     local root_node = tree:root()
-    for child_node in root_node:iter_children() do
+    local end_row, end_col = root_node:end_()
+    for i = root_node:named_child_count() - 1, 0, -1 do
+      local child_node = root_node:named_child(i)
+      local child_end_row, child_end_col = child_node:end_()
+      -- NOTE: Assumes that this node spans till the end of the line
+      if child_end_col > end_col then
+        local line = vim.api.nvim_buf_get_lines(bufnr, child_end_row, child_end_row + 1, false)
+        if line[1] then end_col = #line[1] end
+      end
+      local range = { start_row = child_end_row, start_col = child_end_col, end_row = end_row, end_col = end_col }
+      end_row, end_col = child_node:start()
       if child_node:named() and child_node:type() == "tag" then
         local tag = get_named_child_node_text(child_node, "name", bufnr)
         local user = get_named_child_node_text(child_node, "user", bufnr)
@@ -53,9 +78,9 @@ local finder = function(bufnr, results, opts)
         then
           -- FIXME(ozeghouani): if a comment node contains two tag nodes, it will get the text of the comment node
           table.insert(results, {
-            node = root_node,
             tag = tag,
             user = user,
+            range = range,
             bufnr = bufnr,
           })
         end
@@ -63,7 +88,7 @@ local finder = function(bufnr, results, opts)
     end
   end)
 
-  return results
+  return sort_results(results)
 end
 
 local set_opts = function(files, opts)
@@ -99,7 +124,7 @@ C.generate = function(files, opts)
     buffer_handles = vim.api.nvim_list_bufs()
     if opts.cwd then buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd) end
   elseif opts.files == Files.ALL then
-    file_names = filter.match(config.pre_filter.command, opts.cwd, opts.tags, opts.users)
+    local file_names = filter.match(config.pre_filter.command, opts.cwd, opts.tags, opts.users)
     -- FIXME: which cases are handled for the fallback?
     if not file_names and config.pre_filter.fallback_to_plenary then
       buffer_handles = utils.load_buffers_by_cwd(opts.cwd, opts.hidden, opts.depth)

@@ -35,10 +35,7 @@ local entry_maker = function(opts)
   return function(entry)
     if not vim.api.nvim_buf_is_loaded(entry.bufnr) then return end
     local make_entry = require("telescope.make_entry")
-    local start_row, start_col, end_row, _ = entry.node:range()
-    local node_text = utils.get_node_text(entry.node, entry.bufnr)
-    -- HACK: keeps only the comment text
-    node_text = utils.split_at_first_occurance(node_text, ": ")
+    local node_text = utils.get_text_by_range(entry.range, entry.bufnr)
     return make_entry.set_default_entry_mt({
       bufnr = entry.bufnr,
       value = entry.node,
@@ -51,11 +48,11 @@ local entry_maker = function(opts)
 
       filename = get_filename(entry.bufnr),
       -- need to add one since the previewer subtracts one
-      lnum = start_row + 1,
-      col = start_col,
+      lnum = entry.range.start_row + 1,
+      col = entry.range.start_col,
+      start = entry.range.start_row,
+      finish = entry.range.end_row,
       text = node_text,
-      start = start_row,
-      finish = end_row,
     }, opts)
   end
 end

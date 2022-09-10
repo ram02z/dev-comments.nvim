@@ -7,11 +7,11 @@ local function next_dev_comment(wrap, opts, forward)
   local config = require("dev_comments").config
   wrap = vim.F.if_nil(wrap, config.cycle.wrap)
 
-  -- assumes results are in ascending line order
+  -- NOTE: results are sorted in ascending order
   local results = comments.generate("current", opts)
   if #results == 0 then return end
 
-  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
 
   local start_i, end_i, inc_i
   if forward then
@@ -24,28 +24,42 @@ local function next_dev_comment(wrap, opts, forward)
     inc_i = -1
   end
 
-  local node_row, node_col
+  local index, result_range, node_row, node_start_col, node_end_col
   for i = start_i, end_i, inc_i do
     local entry = results[i]
-    node_row, node_col = entry.node:range()
+    node_row, node_start_col, node_end_col = entry.range.start_row, entry.range.start_col, entry.range.end_col
     node_row = node_row + 1
-    if forward and row < node_row then
-      return { node_row, node_col }
-    elseif not forward and row > node_row then
-      return { node_row, node_col }
+    index = i
+    if forward and row <= node_row then
+      if row ~= node_row or (col < node_start_col and col < node_end_col) then
+        result_range = { node_row, node_start_col }
+        break
+      end
+    elseif not forward and row >= node_row then
+      if row ~= node_row or (col > node_start_col and col > node_end_col) then
+        result_range = { node_row, node_start_col }
+        break
+      end
     end
   end
 
-  if wrap then
+  if result_range == nil and wrap then
     utils.notify("Reached the last node. Wrapping around.", vim.log.levels.INFO)
     if forward then
-      node_row, node_col = results[1].node:range()
+      index = 1
+      node_row, node_start_col = results[1].range.start_row, results[1].range.start_col
     else
-      node_row, node_col = results[#results].node:range()
+      index = #results
+      node_row, node_start_col = results[#results].range.start_row, results[#results].range.start_col
     end
     node_row = node_row + 1
 
-    return { node_row, node_col }
+    result_range = { node_row, node_start_col }
+  end
+
+  if result_range ~= nil then
+    vim.api.nvim_echo({ { string.format("Comment %d of %d", index, #results), "None" } }, false, {})
+    return result_range
   end
 end
 
@@ -53,7 +67,7 @@ local function moveto_pos(pos)
   local win_id = vim.api.nvim_get_current_win()
 
   if not pos then
-    utils.notify("No dev comments to move to", vim.log.levels.WARN)
+    vim.notify_once("No dev comments to move to", vim.log.levels.WARN)
     return
   end
 
