@@ -24,11 +24,12 @@ local function next_dev_comment(wrap, opts, forward)
     inc_i = -1
   end
 
-  local result_range, node_row, node_start_col, node_end_col
+  local index, result_range, node_row, node_start_col, node_end_col
   for i = start_i, end_i, inc_i do
     local entry = results[i]
     node_row, node_start_col, node_end_col = entry.range.start_row, entry.range.start_col, entry.range.end_col
     node_row = node_row + 1
+    index = i
     if forward and row <= node_row then
       if row ~= node_row or (col < node_start_col and col < node_end_col) then
         result_range = { node_row, node_start_col }
@@ -45,8 +46,10 @@ local function next_dev_comment(wrap, opts, forward)
   if result_range == nil and wrap then
     utils.notify("Reached the last node. Wrapping around.", vim.log.levels.INFO)
     if forward then
+      index = 1
       node_row, node_start_col = results[1].range.start_row, results[1].range.start_col
     else
+      index = #results
       node_row, node_start_col = results[#results].range.start_row, results[#results].range.start_col
     end
     node_row = node_row + 1
@@ -54,7 +57,10 @@ local function next_dev_comment(wrap, opts, forward)
     result_range = { node_row, node_start_col }
   end
 
-  if result_range ~= nil then return result_range end
+  if result_range ~= nil then
+    vim.api.nvim_echo({ { string.format("Comment %d of %d", index, #results), "None" } }, false, {})
+    return result_range
+  end
 end
 
 local function moveto_pos(pos)
