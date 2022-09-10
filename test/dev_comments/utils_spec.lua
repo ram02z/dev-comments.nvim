@@ -32,7 +32,7 @@ describe("utils", function()
   it("returns empty string with invalid node", function()
     local node = nil
     local text = utils.get_node_text(node)
-    assert.equals("", text)
+    assert.equals(text, "")
   end)
 
   it("gets fallback highlight from config if tag and fallback are not found", function()
