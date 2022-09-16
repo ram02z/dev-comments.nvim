@@ -64,7 +64,6 @@ Default values:
       },
       [Files.ALL] = {
         hidden = false,
-        depth = 3,
         tags = {},
         users = {},
       },
@@ -79,8 +78,8 @@ Default values:
     pre_filter = {
       -- require("dev_comments.constants").FilterCommand
       command = FilterCommand.RIPGREP,
-      -- If search fails, uses plenary scandir (very slow)
-      fallback_to_plenary = true,
+      -- If search fails, uses vim.loop.scan_dir (very slow)
+      fallback_to_scan_dir = true,
     },
     -- Highlight for the tag in picker (not in buffer)
     highlight = {
@@ -164,6 +163,109 @@ dev-comments.nvim comes with optional default mappings and commands
     end, {})
   end
 <
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                                *bufload_file()*
+                             `bufload_file`({path})
+Parameters~
+{path} `(string)` File path
+Return~
+`(number)` bufnr Buffer number
+
+------------------------------------------------------------------------------
+                                                                    *get_type()*
+                               `get_type`({path})
+Parameters~
+{path} `(string)` File path
+Return~
+`(string)` # directory or file
+
+------------------------------------------------------------------------------
+                                                          *get_path_separator()*
+                             `get_path_separator`()
+Return~
+`(string)`
+
+------------------------------------------------------------------------------
+                                                                    *U.notify()*
+                               `U.notify`({...})
+Parameters~
+{...} `(any)` # vim.notify() args
+
+------------------------------------------------------------------------------
+                                                      *U.get_highlight_by_tag()*
+                  `U.get_highlight_by_tag`({tag}, {fallback})
+Parameters~
+{tag} `(string)` Comment tag
+{fallback} `(string)` Fallback highlight name
+Return~
+`(string)` hl_name Highlight name
+
+------------------------------------------------------------------------------
+                                                             *U.get_node_text()*
+                       `U.get_node_text`({node}, {bufnr})
+Parameters~
+{node} `(any)` # tsnode
+{bufnr} `(number)` Buffer number
+Return~
+`(string)` node_text Returns empty string if node is nil
+
+------------------------------------------------------------------------------
+Class~
+{Range}
+Fields~
+{start_row} `(number)` The start row of text
+{end_row} `(number)` The end row of text
+{start_col} `(number)` The start column of text
+{end_col} `(number)` The end column of text
+
+------------------------------------------------------------------------------
+                                                         *U.get_text_by_range()*
+                    `U.get_text_by_range`({range}, {bufnr})
+Parameters~
+{range} Range The range of the text
+{bufnr} `(number)` The buffer number to get text from
+Return~
+`(string)` text
+
+------------------------------------------------------------------------------
+                                                       *U.load_buffers_by_cwd()*
+                    `U.load_buffers_by_cwd`({cwd}, {hidden})
+Parameters~
+{cwd} `(optional)` `(string)` Directory to search in
+{hidden} `(optional)` `(boolean)` Include hidden files (false default)
+Return~
+`(table)` bufnrs Buffer numbers
+
+------------------------------------------------------------------------------
+                                                     *U.load_buffers_by_fname()*
+                    `U.load_buffers_by_fname`({file_names})
+Parameters~
+{file_names} `(table)` File names
+Return~
+`(table)` bufnrs Buffer numbers
+
+------------------------------------------------------------------------------
+                                                            *U.filter_buffers()*
+                  `U.filter_buffers`({buffer_handles}, {cwd})
+Parameters~
+{buffer_handles} `(table)` Buffer numbers
+{cwd} `(string)` Directory to filter
+Return~
+`(table)` bufnrs Buffer numbers
+
+------------------------------------------------------------------------------
+                                                                     *U.split()*
+                                `U.split`({...})
+
+Parameters~
+{...} `(any)`
+Return~
+`(table)` List of split components
+Return~
+`(nil)` nil vim.split call failed
 
 
 ==============================================================================
