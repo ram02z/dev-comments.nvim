@@ -36,7 +36,6 @@ Install the plugin with your preferred plugin manager
 ```vim
 Plug 'ram02z/dev-comments.nvim'
 Plug 'nvim-treesitter/nvim-treesitter'
-Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim' " optional for picker
 
 lua << EOF
@@ -53,7 +52,6 @@ use({
   "ram02z/dev-comments.nvim",
   requires = {
     "nvim-treesitter/nvim-treesitter",
-    "nvim-lua/plenary.nvim",
     "nvim-telescope/nvim-telescope", -- optional
   },
   config = function()

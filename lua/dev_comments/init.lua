@@ -71,7 +71,6 @@ dev_comments.config = {
     },
     [Files.ALL] = {
       hidden = false,
-      depth = 3,
       tags = {},
       users = {},
     },
@@ -86,8 +85,8 @@ dev_comments.config = {
   pre_filter = {
     -- require("dev_comments.constants").FilterCommand
     command = FilterCommand.RIPGREP,
-    -- If search fails, uses plenary scandir (very slow)
-    fallback_to_plenary = true,
+    -- If search fails, uses vim.loop.scan_dir (very slow)
+    fallback_to_scan_dir = true,
   },
   -- Highlight for the tag in picker (not in buffer)
   highlight = {

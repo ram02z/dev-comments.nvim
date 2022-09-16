@@ -18,7 +18,7 @@ local get_named_child_node_text = function(node, name, bufnr)
   return node_text
 end
 
-local function sort_results(result)
+local sort_results = function(result)
   local t = {}
   for _, v in pairs(result) do
     table.insert(t, v)
@@ -126,8 +126,8 @@ C.generate = function(files, opts)
   elseif opts.files == Files.ALL then
     local file_names = filter.match(config.pre_filter.command, opts.cwd, opts.tags, opts.users)
     -- FIXME: which cases are handled for the fallback?
-    if not file_names and config.pre_filter.fallback_to_plenary then
-      buffer_handles = utils.load_buffers_by_cwd(opts.cwd, opts.hidden, opts.depth)
+    if not file_names and config.pre_filter.fallback_to_scan_dir then
+      buffer_handles = utils.load_buffers_by_cwd(opts.cwd, opts.hidden)
     else
       buffer_handles = utils.load_buffers_by_fname(file_names)
     end

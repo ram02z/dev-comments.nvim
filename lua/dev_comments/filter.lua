@@ -34,25 +34,18 @@ F.match = function(command, cwd, tags, users)
   tags = vim.F.if_nil(tags, {})
   users = vim.F.if_nil(users, {})
 
-  local Job = require("plenary.job")
   local FilterCommandArgs = require("dev_comments.constants").FilterCommandArgs
   local pattern = create_pattern(tags, users)
-  local args = vim.tbl_flatten({ FilterCommandArgs[command], pattern, cwd })
-  local job = Job:new({
-    command = command,
-    args = args,
-  })
+  local cmd = vim.tbl_flatten({ command, FilterCommandArgs[command], pattern, cwd })
 
-  local _, ret = job:sync()
-
-  if ret == 0 then
-    return job:result()
-  elseif ret == 1 then
-    utils.notify("No matching comments found from command: " .. command, vim.log.levels.INFO)
+  local result = vim.fn.systemlist(cmd)
+  if vim.v.shell_error == 0 then
+    return result
+  elseif vim.v.shell_error == 1 then
+    utils.notify("No matching comments found from command: " .. table.concat(cmd, " "), vim.log.levels.INFO)
     return {}
-  elseif ret == 2 then
-    local error = table.concat(job:stderr_result(), "\n")
-    utils.notify("Failed with code " .. ret .. ":" .. error, vim.log.levels.ERROR)
+  else
+    error("Failed with code " .. vim.v.shell_error .. "\nCommand: " .. table.concat(cmd, " "))
   end
 end
 

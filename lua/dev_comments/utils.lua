@@ -8,6 +8,27 @@ local bufload_file = function(file_path)
   return bufnr
 end
 
+local get_type = function(path)
+  local stat = vim.loop.fs_stat(path)
+  if stat then return stat.type end
+end
+
+-- Get path separator depending on OS
+local get_path_separator = function()
+  if jit then
+    local os = string.lower(jit.os)
+    if os == "linux" or os == "osx" or os == "bsd" then
+      return [[/]]
+    else
+      return [[\]]
+    end
+  else
+    return package.config:sub(1, 1)
+  end
+end
+
+local default_seperator = get_path_separator()
+
 U.notify = function(...)
   local config = require("dev_comments").config
   if config.debug then vim.notify(...) end
@@ -64,20 +85,16 @@ U.get_text_by_range = function(range, bufnr)
   return ""
 end
 
-U.load_buffers_by_cwd = function(cwd, hidden, depth)
+U.load_buffers_by_cwd = function(cwd, hidden)
   cwd = cwd or vim.loop.cwd()
+  -- TODO: hidden is not implemented
   hidden = vim.F.if_nil(hidden, false)
-  depth = vim.F.if_nil(depth, 3)
-
-  local S = require("plenary.scandir")
-  local files = S.scan_dir(cwd, { hidden = hidden, depth = depth })
 
   local buffer_handles = {}
-  local P = require("plenary.path")
-  for _, file_path in ipairs(files) do
-    local file = P:new(file_path)
-    if file:is_file() then
-      local bufnr = bufload_file(file:expand())
+  for name, type in vim.fs.dir(cwd) do
+    if type == "file" then
+      local file = cwd .. default_seperator .. name
+      local bufnr = bufload_file(file)
       table.insert(buffer_handles, bufnr)
     end
   end
@@ -89,11 +106,9 @@ U.load_buffers_by_fname = function(file_names)
   if not (type(file_names) == "table") then return end
 
   local buffer_handles = {}
-  local P = require("plenary.path")
-  for _, file_name in ipairs(file_names) do
-    local file = P:new(file_name)
-    if file:is_file() then
-      local bufnr = bufload_file(file:expand())
+  for _, name in ipairs(file_names) do
+    if get_type(name) == "file" then
+      local bufnr = bufload_file(name)
       table.insert(buffer_handles, bufnr)
     end
   end
@@ -104,28 +119,15 @@ end
 U.filter_buffers = function(buffer_handles, cwd)
   cwd = cwd or vim.loop.cwd()
 
-  local P = require("plenary.path")
-  local status, dir = pcall(P.new, cwd)
-  if not status then
-    U.notify("cwd is invalid", vim.log.levels.WARN)
-    return buffer_handles
-  end
-
-  -- TODO: should this be an error?
-  if not dir:is_dir() then
+  if not get_type(cwd) == "directory" then
     U.notify("cwd needs to be a valid directory", vim.log.levels.WARN)
     return buffer_handles
   end
 
-  local dir_path = dir:expand()
   local get_filename_fn = U.get_filename_fn()
   return vim.tbl_filter(function(bufnr)
     local file_name = get_filename_fn(bufnr)
-    local file = P:new(file_name)
-    if file:is_file() then
-      -- if file is not relative to the directory, it is not contained in it
-      return file:make_relative(dir_path) ~= file_name
-    end
+    if get_type(file_name) == "file" then return file_name:sub(1, #cwd) == cwd end
   end, buffer_handles)
 end
 
