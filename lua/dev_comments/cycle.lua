@@ -3,6 +3,12 @@ local C = {}
 local comments = require("dev_comments.comments")
 local utils = require("dev_comments.utils")
 
+-- Finds the position of the next dev comment
+---@param wrap boolean Should wrap around
+---@param opts Opts
+---@param forward boolean Forward search
+---@return number[] pos row and column
+---@private
 local function next_dev_comment(wrap, opts, forward)
   local config = require("dev_comments").config
   wrap = vim.F.if_nil(wrap, config.cycle.wrap)
@@ -63,6 +69,9 @@ local function next_dev_comment(wrap, opts, forward)
   end
 end
 
+-- Move cursor to position
+---@param pos number[] row and column
+---@private
 local function moveto_pos(pos)
   local win_id = vim.api.nvim_get_current_win()
 
@@ -80,11 +89,17 @@ local function moveto_pos(pos)
   end)
 end
 
+-- Move cursor to previous dev comment
+---@param wrap boolean Should wrap around
+---@param opts Opts
 C.goto_prev = function(wrap, opts)
   local pos = next_dev_comment(wrap, opts, false)
   moveto_pos(pos)
 end
 
+-- Move cursor to next dev comment
+---@param wrap boolean Should wrap around
+---@param opts Opts
 C.goto_next = function(wrap, opts)
   local pos = next_dev_comment(wrap, opts, true)
   moveto_pos(pos)

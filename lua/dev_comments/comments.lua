@@ -5,6 +5,31 @@ local cache = require("dev_comments.cache")
 local utils = require("dev_comments.utils")
 local filter = require("dev_comments.filter")
 
+---@class Opts table of options used by comments.generate
+---@field files string
+---@field cwd string
+---@field hidden boolean
+---@field tags string[]
+---@field users string[]
+
+---@class Results table of results returned by comments.generate
+---@field tag string
+---@field user string
+---@field range Range
+---@field bufnr number Buffer number
+
+---@class Range
+---@field start_row number The start row of text
+---@field end_row number The end row of text
+---@field start_col number The start column of text
+---@field end_col number The end column of text
+
+-- Get named child node text
+---@param node any # tsnode
+---@param name string child node type
+---@param bufnr? number defaults to 0
+---@return string child node text
+---@private
 local get_named_child_node_text = function(node, name, bufnr)
   bufnr = bufnr or 0
   local node_text = ""
@@ -18,9 +43,13 @@ local get_named_child_node_text = function(node, name, bufnr)
   return node_text
 end
 
-local sort_results = function(result)
+-- Sort results in ascending order of position
+---@param results Results
+---@return Results
+---@private
+local sort_results = function(results)
   local t = {}
-  for _, v in pairs(result) do
+  for _, v in pairs(results) do
     table.insert(t, v)
   end
 
@@ -34,12 +63,11 @@ local sort_results = function(result)
 end
 
 -- Returns table of nodes parsed by "comment" parser
---
--- @param bufnr: the buffer handle
--- @param results: table of results (used for recursive calls)
--- @param opts: table of options from picker
---
--- @returns results: table of nodes parsed by "comment" parser
+---@param bufnr number buffer number
+---@param results Results # used for recursive calls
+---@param opts table of options from picker
+---@returns results Results
+---@private
 local finder = function(bufnr, results, opts)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   results = results or {}
@@ -76,7 +104,6 @@ local finder = function(bufnr, results, opts)
           (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
           and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
         then
-          -- FIXME(ozeghouani): if a comment node contains two tag nodes, it will get the text of the comment node
           table.insert(results, {
             tag = tag,
             user = user,
@@ -91,15 +118,22 @@ local finder = function(bufnr, results, opts)
   return sort_results(results)
 end
 
+-- Updates options table
+---@param files string # @see constants.Files
+---@param opts Opts
+---@private
 local set_opts = function(files, opts)
   local config = require("dev_comments").config
   if opts.cwd ~= nil then opts.cwd = vim.fn.expand(opts.cwd) end
   opts.hidden = vim.F.if_nil(opts.hidden, config.telescope[files].hidden)
-  opts.depth = vim.F.if_nil(opts.depth, config.telescope[files].depth)
   opts.tags = utils.split(opts.tags, ",", { trimempty = true }) or config.telescope[files].tags
   opts.users = utils.split(opts.users, ",", { trimempty = true }) or config.telescope[files].users
 end
 
+-- Generate results table based on options
+---@param files string # @see constants.Files
+---@param opts Opts
+---@return table
 C.generate = function(files, opts)
   local has_comments_parser = vim.treesitter.require_language("comment", nil, true)
   if not has_comments_parser then

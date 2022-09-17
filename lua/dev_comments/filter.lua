@@ -8,6 +8,11 @@ local tag_pattern = [[\b(%s)(\((.*?)\))?: ]]
 local user_pattern = [[\b([A-Z_-]+)(\((%s)\)): ]]
 local full_pattern = [[\b(%s)(\((%s)\)): ]]
 
+-- Creates pattern depending on params
+---@param tags string[]
+---@param users string[]
+---@return string default or generated pattern
+---@private
 local create_pattern = function(tags, users)
   if #tags == 0 and #users == 0 then return default_pattern end
 
@@ -22,8 +27,12 @@ local create_pattern = function(tags, users)
   end
 end
 
--- TODO: implement depth search
--- TODO: implement hidden flag (ignores hidden directories by default)
+-- Match dev comments using system search tool
+---@param command string # @see constants.FilterCommand
+---@param cwd? string # defaults to current working directory
+---@param tags? string[] # defaults to empty list
+---@param users? string[] # defaults to empty list
+---@return string[] list of files with dev comments
 F.match = function(command, cwd, tags, users)
   if vim.fn.executable(command) ~= 1 then
     utils.notify(command .. "not found in PATH", vim.log.levels.WARN)
@@ -33,6 +42,7 @@ F.match = function(command, cwd, tags, users)
   cwd = vim.F.if_nil(cwd, vim.loop.cwd())
   tags = vim.F.if_nil(tags, {})
   users = vim.F.if_nil(users, {})
+  -- TODO: implement hidden flag (rg ignores hidden directories by default but grep doesn't)
 
   local FilterCommandArgs = require("dev_comments.constants").FilterCommandArgs
   local pattern = create_pattern(tags, users)

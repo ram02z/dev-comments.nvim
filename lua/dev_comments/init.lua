@@ -60,7 +60,7 @@ dev_comments.config = {
   -- Loads and sets default options for telescope plugin
   telescope = {
     load = true,
-    -- require("dev_comments.constants").Files
+    -- See |dev-comments-file-modes|
     [Files.CURRENT] = {
       tags = {},
       users = {},
@@ -81,9 +81,8 @@ dev_comments.config = {
     wrap = true,
   },
   -- Improves performance when searching in a large directory
-  -- Requires ripgrep or grep
   pre_filter = {
-    -- require("dev_comments.constants").FilterCommand
+    -- See |dev-comments-filter-modes|
     command = FilterCommand.RIPGREP,
     -- If search fails, uses vim.loop.scan_dir (very slow)
     fallback_to_scan_dir = true,

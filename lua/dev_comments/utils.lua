@@ -3,6 +3,7 @@ local U = {}
 -- Load buffer by path
 ---@param path string File path
 ---@return number bufnr Buffer number
+---@private
 local bufload_file = function(path)
   local bufnr = vim.fn.bufadd(path)
   -- NOTE: silent is required to avoid E325
@@ -14,6 +15,7 @@ end
 -- Get file type
 ---@param path string File path
 ---@return string # directory or file
+---@private
 local get_type = function(path)
   local stat = vim.loop.fs_stat(path)
   if stat then return stat.type end
@@ -21,6 +23,7 @@ end
 
 -- Get path separator depending on OS
 ---@return string
+---@private
 local get_path_separator = function()
   if jit then
     local os = string.lower(jit.os)
@@ -39,6 +42,7 @@ local default_seperator = get_path_separator()
 -- Wrapper around vim.notify
 -- Only notifies when config.debug is true
 ---@param ... any # vim.notify() args
+---@private
 U.notify = function(...)
   local config = require("dev_comments").config
   if config.debug then vim.notify(...) end
@@ -48,6 +52,7 @@ end
 ---@param tag string Comment tag
 ---@param fallback string Fallback highlight name
 ---@return string hl_name Highlight name
+---@private
 U.get_highlight_by_tag = function(tag, fallback)
   local config = require("dev_comments").config
   local hl_name = config.highlight.tags[tag]
@@ -57,6 +62,7 @@ U.get_highlight_by_tag = function(tag, fallback)
 end
 
 -- Get name of file by buffer
+---@private
 U.get_filename_fn = function()
   local bufnr_name_cache = {}
   return function(bufnr)
@@ -74,21 +80,18 @@ end
 ---@param node any # tsnode
 ---@param bufnr number Buffer number
 ---@return string node_text Returns empty string if node is nil
+---@private
 U.get_node_text = function(node, bufnr)
   if not node then return "" end
 
   return vim.treesitter.get_node_text(node, bufnr)
 end
 
----@class Range
----@field start_row number The start row of text
----@field end_row number The end row of text
----@field start_col number The start column of text
----@field end_col number The end column of text
-
+-- Get text in buffer by range
 ---@param range Range The range of the text
 ---@param bufnr number The buffer number to get text from
 ---@return string text
+---@private
 U.get_text_by_range = function(range, bufnr)
   local lines
   local eof_row = vim.api.nvim_buf_line_count(bufnr)
@@ -117,6 +120,7 @@ end
 ---@param cwd? string Directory to search in
 ---@param hidden? boolean Include hidden files (false default)
 ---@return table bufnrs Buffer numbers
+---@private
 U.load_buffers_by_cwd = function(cwd, hidden)
   cwd = cwd or vim.loop.cwd()
   -- TODO: hidden is not implemented
@@ -137,6 +141,7 @@ end
 -- Loads all file names as vim buffers
 ---@param file_names table File names
 ---@return table bufnrs Buffer numbers
+---@private
 U.load_buffers_by_fname = function(file_names)
   vim.validate({ file_names = { file_names, "table" } })
 
@@ -155,6 +160,7 @@ end
 ---@param buffer_handles table Buffer numbers
 ---@param cwd string Directory to filter
 ---@return table bufnrs Buffer numbers
+---@private
 U.filter_buffers = function(buffer_handles, cwd)
   cwd = cwd or vim.loop.cwd()
 
@@ -175,6 +181,7 @@ end
 ---@param ... any
 ---@return table List of split components
 ---@return nil nil vim.split call failed
+---@private
 U.split = function(...)
   local ok, result = pcall(vim.split, ...)
   if not ok then return nil end
