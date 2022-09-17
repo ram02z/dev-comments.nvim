@@ -4,6 +4,8 @@ Table of contents:
   Abstract......................................................|dev-comments|
   The setup function....................................|dev_comments.setup()|
   Configure the setup.............................|dev-comments-configuration|
+  File modes.........................................|dev-comments-file-modes|
+  Pre-filter modes.................................|dev-comments-filter-modes|
   Default mappings.............................|dev-comments-default-mappings|
   Default commands.............................|dev-comments-default-commands|
   Telecope integration................................|dev-comments-telescope|
@@ -53,7 +55,7 @@ Default values:
     -- Loads and sets default options for telescope plugin
     telescope = {
       load = true,
-      -- require("dev_comments.constants").Files
+      -- See |dev-comments-file-modes|
       [Files.CURRENT] = {
         tags = {},
         users = {},
@@ -74,9 +76,8 @@ Default values:
       wrap = true,
     },
     -- Improves performance when searching in a large directory
-    -- Requires ripgrep or grep
     pre_filter = {
-      -- require("dev_comments.constants").FilterCommand
+      -- See |dev-comments-filter-modes|
       command = FilterCommand.RIPGREP,
       -- If search fails, uses vim.loop.scan_dir (very slow)
       fallback_to_scan_dir = true,
@@ -96,6 +97,114 @@ Default values:
     },
   }
 <
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                                  *C.register()*
+                                 `C.register`()
+Return~
+`(boolean)` Cache is registered
+
+------------------------------------------------------------------------------
+                                                                *C.unregister()*
+                                `C.unregister`()
+Return~
+`(boolean)` Cache is unregistered
+
+
+==============================================================================
+------------------------------------------------------------------------------
+Class~
+{Opts} table of options used by comments.generate
+Fields~
+{files} `(string)`
+{cwd} `(string)`
+{hidden} `(boolean)`
+{tags} `(string[])`
+{users} `(string[])`
+
+------------------------------------------------------------------------------
+Class~
+{Results} table of results returned by comments.generate
+Fields~
+{tag} `(string)`
+{user} `(string)`
+{range} Range
+{bufnr} `(number)` Buffer number
+
+------------------------------------------------------------------------------
+Class~
+{Range}
+Fields~
+{start_row} `(number)` The start row of text
+{end_row} `(number)` The end row of text
+{start_col} `(number)` The start column of text
+{end_col} `(number)` The end column of text
+
+------------------------------------------------------------------------------
+                                                                  *C.generate()*
+                         `C.generate`({files}, {opts})
+Parameters~
+{files} `(string)` # @see constants.Files
+{opts} Opts
+Return~
+`(table)`
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                       *dev-comments-file-modes*
+# File modes~
+
+>
+  {
+    Files.CURRENT,
+    Files.OPEN,
+    Files.ALL
+  }
+<
+
+------------------------------------------------------------------------------
+                                                     *dev-comments-filter-modes*
+# Pre-filter modes~
+
+>
+  {
+    FilterCommand.RIPGREP,
+    FilterCommand.GREP,
+    FilterCommand.NONE,
+  }
+<
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                                 *C.goto_prev()*
+                         `C.goto_prev`({wrap}, {opts})
+Parameters~
+{wrap} `(boolean)` Should wrap around
+{opts} Opts
+
+------------------------------------------------------------------------------
+                                                                 *C.goto_next()*
+                         `C.goto_next`({wrap}, {opts})
+Parameters~
+{wrap} `(boolean)` Should wrap around
+{opts} Opts
+
+
+==============================================================================
+------------------------------------------------------------------------------
+                                                                     *F.match()*
+                  `F.match`({command}, {cwd}, {tags}, {users})
+Parameters~
+{command} `(string)` # @see constants.FilterCommand
+{cwd} `(optional)` `(string)` # defaults to current working directory
+{tags} `(optional)` `(string[])` # defaults to empty list
+{users} `(optional)` `(string[])` # defaults to empty list
+Return~
+`(string[])` list of files with dev comments
 
 
 ==============================================================================
@@ -163,109 +272,6 @@ dev-comments.nvim comes with optional default mappings and commands
     end, {})
   end
 <
-
-
-==============================================================================
-------------------------------------------------------------------------------
-                                                                *bufload_file()*
-                             `bufload_file`({path})
-Parameters~
-{path} `(string)` File path
-Return~
-`(number)` bufnr Buffer number
-
-------------------------------------------------------------------------------
-                                                                    *get_type()*
-                               `get_type`({path})
-Parameters~
-{path} `(string)` File path
-Return~
-`(string)` # directory or file
-
-------------------------------------------------------------------------------
-                                                          *get_path_separator()*
-                             `get_path_separator`()
-Return~
-`(string)`
-
-------------------------------------------------------------------------------
-                                                                    *U.notify()*
-                               `U.notify`({...})
-Parameters~
-{...} `(any)` # vim.notify() args
-
-------------------------------------------------------------------------------
-                                                      *U.get_highlight_by_tag()*
-                  `U.get_highlight_by_tag`({tag}, {fallback})
-Parameters~
-{tag} `(string)` Comment tag
-{fallback} `(string)` Fallback highlight name
-Return~
-`(string)` hl_name Highlight name
-
-------------------------------------------------------------------------------
-                                                             *U.get_node_text()*
-                       `U.get_node_text`({node}, {bufnr})
-Parameters~
-{node} `(any)` # tsnode
-{bufnr} `(number)` Buffer number
-Return~
-`(string)` node_text Returns empty string if node is nil
-
-------------------------------------------------------------------------------
-Class~
-{Range}
-Fields~
-{start_row} `(number)` The start row of text
-{end_row} `(number)` The end row of text
-{start_col} `(number)` The start column of text
-{end_col} `(number)` The end column of text
-
-------------------------------------------------------------------------------
-                                                         *U.get_text_by_range()*
-                    `U.get_text_by_range`({range}, {bufnr})
-Parameters~
-{range} Range The range of the text
-{bufnr} `(number)` The buffer number to get text from
-Return~
-`(string)` text
-
-------------------------------------------------------------------------------
-                                                       *U.load_buffers_by_cwd()*
-                    `U.load_buffers_by_cwd`({cwd}, {hidden})
-Parameters~
-{cwd} `(optional)` `(string)` Directory to search in
-{hidden} `(optional)` `(boolean)` Include hidden files (false default)
-Return~
-`(table)` bufnrs Buffer numbers
-
-------------------------------------------------------------------------------
-                                                     *U.load_buffers_by_fname()*
-                    `U.load_buffers_by_fname`({file_names})
-Parameters~
-{file_names} `(table)` File names
-Return~
-`(table)` bufnrs Buffer numbers
-
-------------------------------------------------------------------------------
-                                                            *U.filter_buffers()*
-                  `U.filter_buffers`({buffer_handles}, {cwd})
-Parameters~
-{buffer_handles} `(table)` Buffer numbers
-{cwd} `(string)` Directory to filter
-Return~
-`(table)` bufnrs Buffer numbers
-
-------------------------------------------------------------------------------
-                                                                     *U.split()*
-                                `U.split`({...})
-
-Parameters~
-{...} `(any)`
-Return~
-`(table)` List of split components
-Return~
-`(nil)` nil vim.split call failed
 
 
 ==============================================================================
