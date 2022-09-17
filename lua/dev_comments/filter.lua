@@ -3,9 +3,9 @@ local F = {}
 local utils = require("dev_comments.utils")
 
 -- Greedy pattern capture all uppercase "dev" comments
-local default_pattern = [[\b([A-Z-_]+)(\((.*?)\))?: ]]
+local default_pattern = [[\b([A-Z_-]+)(\((.*?)\))?: ]]
 local tag_pattern = [[\b(%s)(\((.*?)\))?: ]]
-local user_pattern = [[\b([A-Z-_]+)(\((%s)\)): ]]
+local user_pattern = [[\b([A-Z_-]+)(\((%s)\)): ]]
 local full_pattern = [[\b(%s)(\((%s)\)): ]]
 
 local create_pattern = function(tags, users)
