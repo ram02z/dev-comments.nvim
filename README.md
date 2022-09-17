@@ -16,7 +16,7 @@
 
 ### Core
 
-- Neovim >= 0.7.0
+- Neovim >= 0.8.0
 
 ### Optional
 
