@@ -11,6 +11,7 @@ local filter = require("dev_comments.filter")
 ---@field hidden boolean
 ---@field tags string[]
 ---@field users string[]
+---@field find string[]
 
 ---@class Results table of results returned by comments.generate
 ---@field tag string
@@ -118,13 +119,30 @@ local finder = function(bufnr, results, opts)
   return sort_results(results)
 end
 
+--- Get search directory by finding files or directories upwards
+---@param cwd string|nil
+---@param find string[]
+---@return string
+---@private
+local get_search_dir = function(cwd, find)
+  cwd = vim.F.if_nil(cwd, vim.loop.cwd())
+  cwd = vim.fs.normalize(cwd)
+  if #find > 0 then
+    local markers = vim.fs.find(find, { path = cwd, upward = true, limit = 1 })
+    if #markers > 0 then return vim.fs.dirname(markers[1]) end
+  end
+
+  return cwd
+end
+
 -- Updates options table
 ---@param files string # @see constants.Files
 ---@param opts Opts
 ---@private
 local set_opts = function(files, opts)
   local config = require("dev_comments").config
-  if opts.cwd ~= nil then opts.cwd = vim.fn.expand(opts.cwd) end
+  opts.find = utils.split(opts.find, ",", { trimempty = true }) or {}
+  opts.cwd = get_search_dir(opts.cwd, opts.find)
   opts.hidden = vim.F.if_nil(opts.hidden, config.telescope[files].hidden)
   opts.tags = utils.split(opts.tags, ",", { trimempty = true }) or config.telescope[files].tags
   opts.users = utils.split(opts.users, ",", { trimempty = true }) or config.telescope[files].users
@@ -140,6 +158,9 @@ C.generate = function(files, opts)
     error("This plugin requires 'comment' parser to be installed. Try running 'TSInstall comment'")
   end
 
+  -- Used to stop filtering buffers for 'open' file mode
+  local has_cwd = opts.cwd or false
+
   opts = opts or {}
   opts.files = files
   set_opts(files, opts)
@@ -153,10 +174,10 @@ C.generate = function(files, opts)
   local buffer_handles = {}
   local config = require("dev_comments").config
   if opts.files == Files.CURRENT then
-    buffer_handles = { vim.api.nvim_get_current_buf() }
+    buffer_handles.insert(vim.api.nvim_get_current_buf())
   elseif opts.files == Files.OPEN then
     buffer_handles = vim.api.nvim_list_bufs()
-    if opts.cwd then buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd) end
+    if has_cwd then buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd) end
   elseif opts.files == Files.ALL then
     local file_names = filter.match(config.pre_filter.command, opts.cwd, opts.tags, opts.users)
     -- FIXME: which cases are handled for the fallback?

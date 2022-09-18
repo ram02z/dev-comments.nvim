@@ -16,7 +16,7 @@ C.Files = {
   OPEN = "open",
   --minidoc_replace_end
   --minidoc_replace_start Files.ALL
-  ALL = "all"
+  ALL = "all",
   --minidoc_replace_end
 }
 --minidoc_afterlines_end
@@ -37,7 +37,7 @@ C.FilterCommand = {
   GREP = "grep",
   --minidoc_replace_end
   --minidoc_replace_start FilterCommand.NONE,
-  NONE = ""
+  NONE = "",
   --minidoc_replace_end
 }
 --minidoc_afterlines_end

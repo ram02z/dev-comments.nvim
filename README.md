@@ -85,7 +85,11 @@ The file modes:
 The main options are:
 - `cwd`: filters the search by working directory
   - Default: value of `vim.loop.cwd()`
-  - Uses `vim.fn.expand()` to expand variables i.e. `~` -> `/root/home/`
+  - Uses `vim.fs.normalize()` to expand variables i.e. `~` -> `/root/home/`
+- `find`: finds files/directories upwards of the working directory
+  - Default: empty table
+  - Sets the first found file/directory to new search directory
+  - If no matching file/directory found, uses `cwd`
 - `tags`: filters the search by tags i.e. `<TAG>: `
   - Default: all tags
   - Use `table<string>` if using the API directly

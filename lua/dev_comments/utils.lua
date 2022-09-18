@@ -162,9 +162,7 @@ end
 ---@return table bufnrs Buffer numbers
 ---@private
 U.filter_buffers = function(buffer_handles, cwd)
-  cwd = cwd or vim.loop.cwd()
-
-  if not get_type(cwd) == "directory" then
+  if not cwd or get_type(cwd) == "directory" then
     U.notify("cwd needs to be a valid directory", vim.log.levels.WARN)
     return buffer_handles
   end
