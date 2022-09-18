@@ -123,6 +123,7 @@ Fields~
 {hidden} `(boolean)`
 {tags} `(string[])`
 {users} `(string[])`
+{find} `(string[])`
 
 ------------------------------------------------------------------------------
 Class~
