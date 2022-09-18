@@ -88,15 +88,14 @@ The main options are:
   - Uses `vim.fs.normalize()` to expand variables i.e. `~` -> `/root/home/`
 - `find`: finds files/directories upwards of the working directory
   - Default: empty table
+  - Use comma separated strings if you using the commands, i.e. `find=.git`
   - Sets the first found file/directory to new search directory
   - If no matching file/directory found, uses `cwd`
 - `tags`: filters the search by tags i.e. `<TAG>: `
   - Default: all tags
-  - Use `table<string>` if using the API directly
   - Use comma separated strings if you using the commands, i.e. `tags=TODO`
 - `users` : filters the search by user i.e. `<TAG>(<USER>):`
   - Default: all users 
-  - Use `table<string>` if using the API directly
   - Use comma separated strings if you using the commands, i.e. `users=ram02z,foo`
 
 ### Telescope
