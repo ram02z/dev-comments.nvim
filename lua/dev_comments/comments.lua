@@ -158,11 +158,12 @@ C.generate = function(files, opts)
     error("This plugin requires 'comment' parser to be installed. Try running 'TSInstall comment'")
   end
 
+  opts = opts or {}
+  opts.files = files
+
   -- Used to stop filtering buffers for 'open' file mode
   local has_cwd = opts.cwd or false
 
-  opts = opts or {}
-  opts.files = files
   set_opts(files, opts)
 
   local results = cache.get(opts)
@@ -174,7 +175,7 @@ C.generate = function(files, opts)
   local buffer_handles = {}
   local config = require("dev_comments").config
   if opts.files == Files.CURRENT then
-    buffer_handles.insert(vim.api.nvim_get_current_buf())
+    buffer_handles = { vim.api.nvim_get_current_buf() }
   elseif opts.files == Files.OPEN then
     buffer_handles = vim.api.nvim_list_bufs()
     if has_cwd then buffer_handles = utils.filter_buffers(buffer_handles, opts.cwd) end
