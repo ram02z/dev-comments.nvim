@@ -2,11 +2,11 @@ local dc_picker = {}
 
 local Files = require("dev_comments.constants").Files
 local entry_maker = require("telescope._extensions.dev_comments.entry_maker")
-local comments = require("dev_comments.comments")
+local generate = require("dev_comments.comments").generate
 local utils = require("dev_comments.utils")
 
-local create = function(results, opts)
-  if vim.tbl_isempty(results) then utils.notify("No dev comments found", vim.log.levels.INFO) end
+local create = function(comments, opts)
+  if vim.tbl_isempty(comments) then utils.notify("No dev comments found", vim.log.levels.INFO) end
 
   local conf = require("telescope.config").values
   local finders = require("telescope.finders")
@@ -15,10 +15,9 @@ local create = function(results, opts)
     .new(opts, {
       prompt_title = "Dev Comments",
       finder = finders.new_table({
-        results = results,
-        entry_maker = opts.entry_maker or entry_maker(opts),
+        results = comments,
+        entry_maker = entry_maker(opts),
       }),
-      -- FIXME: ranges for the comments are incorrect
       previewer = require("telescope._extensions.dev_comments.previewer")(opts),
       sorter = conf.prefilter_sorter({
         tag = "tag",
@@ -29,8 +28,8 @@ local create = function(results, opts)
 end
 
 local picker = function(files, opts)
-  local results = comments.generate(files, opts)
-  create(results, opts)
+  local comments = generate(files, opts)
+  create(comments, opts)
 end
 
 dc_picker.current = function(opts)

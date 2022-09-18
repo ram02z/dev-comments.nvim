@@ -18,7 +18,7 @@ local entry_maker = function(opts)
     items = display_items,
   })
 
-  -- TODO: add the name of the buffer and line number
+  -- TODO: add the name of the buffer
   local make_display = function(entry)
     local display_columns = {
       { entry.tag, utils.get_highlight_by_tag(entry.tag), utils.get_highlight_by_tag(entry.tag) },
@@ -32,25 +32,26 @@ local entry_maker = function(opts)
   end
 
   local get_filename = utils.get_filename_fn()
-  return function(entry)
-    if not vim.api.nvim_buf_is_loaded(entry.bufnr) then return end
+  --- Create entry
+  ---@param comment Comment
+  ---@return table
+  return function(comment)
+    if not vim.api.nvim_buf_is_loaded(comment.bufnr) then return end
+
     local make_entry = require("telescope.make_entry")
-    local node_text = utils.get_text_by_range(entry.range, entry.bufnr)
+    local node_text = utils.get_text_by_range(comment.range, comment.bufnr)
     return make_entry.set_default_entry_mt({
-      bufnr = entry.bufnr,
-      value = entry.node,
-      tag = entry.tag,
-      user = entry.user,
-      ordinal = node_text .. " " .. (entry.tag or "unknown"),
+      bufnr = comment.bufnr,
+      value = node_text,
+      tag = comment.tag,
+      user = comment.user,
+      ordinal = comment.tag,
       display = make_display,
-
-      node_text = node_text,
-
-      filename = get_filename(entry.bufnr),
+      filename = get_filename(comment.bufnr),
       -- need to add one since the previewer subtracts one
-      lnum = entry.range.start_row + 1,
-      col = entry.range.start_col,
-      finish = entry.range.end_col,
+      lnum = comment.range.start_row + 1,
+      col = comment.range.start_col,
+      finish = comment.range.end_col,
       text = node_text,
     }, opts)
   end

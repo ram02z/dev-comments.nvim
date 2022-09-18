@@ -18,7 +18,7 @@ local hash_func = function(opts)
 end
 
 -- Add entry to cache
----@param entry Results
+---@param entry Comment
 ---@param opts Opts
 ---@return boolean Added to cache
 ---@private
@@ -33,7 +33,7 @@ end
 
 -- Get entry from cache
 ---@param opts Opts
----@return Results
+---@return Comment
 ---@private
 C.get = function(opts)
   if not registered then return nil end

@@ -1,6 +1,6 @@
 local C = {}
 
-local comments = require("dev_comments.comments")
+local generate = require("dev_comments.comments").generate
 local utils = require("dev_comments.utils")
 
 -- Finds the position of the next dev comment
@@ -13,59 +13,59 @@ local function next_dev_comment(wrap, opts, forward)
   local config = require("dev_comments").config
   wrap = vim.F.if_nil(wrap, config.cycle.wrap)
 
-  -- NOTE: results are sorted in ascending order
-  local results = comments.generate("current", opts)
-  if #results == 0 then return end
+  -- NOTE: comments are sorted in ascending order
+  local comments = generate("current", opts)
+  if #comments == 0 then return end
 
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
 
   local start_i, end_i, inc_i
   if forward then
     start_i = 1
-    end_i = #results
+    end_i = #comments
     inc_i = 1
   else
-    start_i = #results
+    start_i = #comments
     end_i = 1
     inc_i = -1
   end
 
-  local index, result_range, node_row, node_start_col, node_end_col
+  local index, comment_range, node_row, node_start_col, node_end_col
   for i = start_i, end_i, inc_i do
-    local entry = results[i]
+    local entry = comments[i]
     node_row, node_start_col, node_end_col = entry.range.start_row, entry.range.start_col, entry.range.end_col
     node_row = node_row + 1
     index = i
     if forward and row <= node_row then
       if row ~= node_row or (col < node_start_col and col < node_end_col) then
-        result_range = { node_row, node_start_col }
+        comment_range = { node_row, node_start_col }
         break
       end
     elseif not forward and row >= node_row then
       if row ~= node_row or (col > node_start_col and col > node_end_col) then
-        result_range = { node_row, node_start_col }
+        comment_range = { node_row, node_start_col }
         break
       end
     end
   end
 
-  if result_range == nil and wrap then
+  if comment_range == nil and wrap then
     utils.notify("Reached the last node. Wrapping around.", vim.log.levels.INFO)
     if forward then
       index = 1
-      node_row, node_start_col = results[1].range.start_row, results[1].range.start_col
+      node_row, node_start_col = comments[1].range.start_row, comments[1].range.start_col
     else
-      index = #results
-      node_row, node_start_col = results[#results].range.start_row, results[#results].range.start_col
+      index = #comments
+      node_row, node_start_col = comments[#comments].range.start_row, comments[#comments].range.start_col
     end
     node_row = node_row + 1
 
-    result_range = { node_row, node_start_col }
+    comment_range = { node_row, node_start_col }
   end
 
-  if result_range ~= nil then
-    vim.api.nvim_echo({ { string.format("Comment %d of %d", index, #results), "None" } }, false, {})
-    return result_range
+  if comment_range ~= nil then
+    vim.api.nvim_echo({ { string.format("Comment %d of %d", index, #comments), "None" } }, false, {})
+    return comment_range
   end
 end
 

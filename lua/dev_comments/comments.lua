@@ -13,7 +13,7 @@ local filter = require("dev_comments.filter")
 ---@field users string[]
 ---@field find string[]
 
----@class Results table of results returned by comments.generate
+---@class Comment
 ---@field tag string
 ---@field user string
 ---@field range Range
@@ -44,13 +44,13 @@ local get_named_child_node_text = function(node, name, bufnr)
   return node_text
 end
 
--- Sort results in ascending order of position
----@param results Results
----@return Results
+-- Sort comments in ascending order of position
+---@param comments Comment
+---@return Comment
 ---@private
-local sort_results = function(results)
+local sort_comments = function(comments)
   local t = {}
-  for _, v in pairs(results) do
+  for _, v in pairs(comments) do
     table.insert(t, v)
   end
 
@@ -63,19 +63,19 @@ local sort_results = function(results)
   return t
 end
 
--- Returns table of nodes parsed by "comment" parser
+-- Returns table of comments parsed by "comment" parser
 ---@param bufnr number buffer number
----@param results Results # used for recursive calls
----@param opts table of options from picker
----@returns results Results
+---@param comments Comment[]
+---@param opts Opts
+---@returns Comment[]
 ---@private
-local finder = function(bufnr, results, opts)
+local finder = function(bufnr, comments, opts)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
-  results = results or {}
+  comments = comments or {}
   local status, root_lang_tree = pcall(vim.treesitter.get_parser, bufnr)
   if not status then
     utils.notify(root_lang_tree, vim.log.levels.WARN)
-    return results
+    return comments
   end
 
   local comment_lang_tree
@@ -83,7 +83,7 @@ local finder = function(bufnr, results, opts)
     if lang == "comment" then comment_lang_tree = child end
   end)
 
-  if not comment_lang_tree then return results end
+  if not comment_lang_tree then return comments end
 
   comment_lang_tree:for_each_tree(function(tree)
     local root_node = tree:root()
@@ -105,7 +105,7 @@ local finder = function(bufnr, results, opts)
           (#opts.tags == 0 or vim.tbl_contains(opts.tags, tag))
           and (#opts.users == 0 or vim.tbl_contains(opts.users, user))
         then
-          table.insert(results, {
+          table.insert(comments, {
             tag = tag,
             user = user,
             range = range,
@@ -116,7 +116,7 @@ local finder = function(bufnr, results, opts)
     end
   end)
 
-  return sort_results(results)
+  return sort_comments(comments)
 end
 
 --- Get search directory by finding files or directories upwards
@@ -148,10 +148,10 @@ local set_opts = function(files, opts)
   opts.users = utils.split(opts.users, ",", { trimempty = true }) or config.telescope[files].users
 end
 
--- Generate results table based on options
+-- Generate comments list based on options
 ---@param files string # @see constants.Files
 ---@param opts Opts
----@return table
+---@return Comment[]
 C.generate = function(files, opts)
   local has_comments_parser = vim.treesitter.require_language("comment", nil, true)
   if not has_comments_parser then
@@ -166,10 +166,10 @@ C.generate = function(files, opts)
 
   set_opts(files, opts)
 
-  local results = cache.get(opts)
-  if results then
+  local comments = cache.get(opts)
+  if comments then
     utils.notify("cache hit", vim.log.levels.DEBUG)
-    return results
+    return comments
   end
 
   local buffer_handles = {}
@@ -189,20 +189,20 @@ C.generate = function(files, opts)
     end
   end
 
-  results = {}
+  comments = {}
   for _, bufnr in ipairs(buffer_handles) do
     if vim.api.nvim_buf_is_loaded(bufnr) then
       local hl = vim.treesitter.highlighter.active[bufnr]
       if not hl then utils.notify("Treesitter not active on bufnr: " .. bufnr, vim.log.levels.DEBUG) end
-      results = finder(bufnr, results, opts)
+      comments = finder(bufnr, comments, opts)
     end
   end
 
-  if not cache.add(results, opts) then
+  if not cache.add(comments, opts) then
     utils.notify("couldn't add to cache. Cache is either not registered or files is invalid.")
   end
 
-  return results
+  return comments
 end
 
 return C
